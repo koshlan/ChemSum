@@ -1,0 +1,328 @@
+---
+title: "Sum of PAH Groups"
+author: "Koshlan Mayer-Blackwell"
+date: "January 10, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(dplyr)
+require(knitr)
+require(tidyr)
+require(RODBC)
+```
+### PAH Summation Script
+
+### Backround
+
+Polycyclic aromatic hydrocarbons (PAHs) are a group of chemicals 
+found in petrogenic hydrocarbons and generated from the combustion of 
+organic mateiral (e.g. coal, wood, fuels).
+
+Lab data reports contain concentrations of individual chemicals; however, 
+regulations are often based on the total aggregate concentration of multiple PAHs. 
+
+Rules and reporting requiremens for summed parameters, particualrly 
+when some results are below analytical method detection limits, 
+can be agency or site-specific. 
+
+It is also often useful to distinguish total concentrations of 
+lower (LPAH) and higher (HPAH) molecular weight PAHs. 
+
+PAHs that are known to be carcinogenic (cPAHs) 
+are often summed with a correction factor to report cPAH concentration 
+equivalent to the potency of cPAHs—A benzo(a)pyrene (BaP)
+Total cPAHs—A benzo(a)pyrene (BaP) equivalent (BaPEq) concentration of a sample 
+is calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective 
+potency equivalency factors (PEFs), and summing the resulting concentrations. 
+
+### Script Inputs
+
+<li>db - string path to relational databse database</li>
+<li>query_string - string SQL query used to select relevant data</li>
+<li>output_suffic - string suffix to append to output</li>
+
+
+```{r inputs}
+db   <- "L:/DTNA/PGG_SedDB_2018_SQL.mdb"
+query_string = "SELECT * FROM ExR_2bSUM_All"
+output_suffix = "SUMPAHs_2018_10_9.txt"  
+```
+
+### Script Output Format
+
+PGG Electronic Data Deliverable (EDD)"|" delimited file with LPAH, HPAH, and CPAH PEQ sums
+
+The output of this script is an electronic data deliverable 
+with summed results. The EDD produced has the following 
+standard fields to comply with database import routines:
+  <li> PRJ_NAME       </li>
+  <li> EVENT          </li>
+  <li> LAB_ID         </li>
+  <li> SAMPLE_DT      </li>
+  <li> ANALYSIS_METH  </li>
+  <li> CONSTITUENT    </li>
+  <li> CAS_ID         </li>
+  <li> P_CODE         </li>
+  <li> SAMPLE_ID      </li>
+  <li> EXTRACTED DATE </li>
+  <li> ANALYZED_DT    </li>
+  <li> DILUTION       </li>
+  <li> RESULT         </li>
+  <li> UNITS          </li>
+  <li> QUAL           </li>
+  <li> LIMIT          </li>
+  <li> QA             </li>
+  <li> COMMENTS       </li>
+
+To accomodate multiple reporting requirements each sum is output according to three definition.
+  <li> CPAH_ND_zero - non-detection do not contribute to sum                          </li>
+  <li> CPAH_ND_half - non-dections contribute to sum at half detection limit          </li>
+  <li> CPAH_ND_full - non-detection contribute to sum at full detection limit         </li>
+
+
+
+### Initialize Analyte Definitions as data.frames  
+
+<li> Total PAHs—Total polycyclic aromatic hydrocarbons (PAHs) are the sum of the individual LPAHs and HPAHs. </li>
+
+
+<li> Total cPAHs—A benzo(a)pyrene (BaP) equivalent (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs), 
+and summing the resulting concentrations.  </li>
+
+
+<li>PAHs classified as carcinogenic are:
+benzo(a)anthracene, chrysene, benzo(b)fluoranthene, benzo(k)fluoranthene, benzo(a)pyrene, indeno(1,2,3,-c,d)pyrene, and dibenzo(a,h)anthracene.  </li>
+
+
+<li> PEFs were assigned according to USEPA (1993) Table 8. Estimated Order of Potential Potencies of Selected PAH Based on Mouse Skin Carcinogenesis "Relative Potency" 2nd column:<li> 
+
+
+```{r definitions, message = F, warnings = F, echo =T}
+
+cPAH <- data.frame( PAH = c("Benz(a)anthracene",
+                             "Benzo(a)pyrene",
+                              "Benzo(b)fluoranthene",
+                              "Benzo(k)fluoranthene",
+                              "Chrysene",
+                              "Dibenzo(a,h)anthracene",
+                            "Indeno(1,2,3-cd)pyrene"),
+                    PEF = c(0.1, 1, 0.1, 0.01,0.001,1,0.1),
+                    stringsAsFactors=FALSE
+                    )
+
+PAH <- data.frame( PAH = c("2-Methylnaphthalene", "Acenaphthene", "Acenaphthylene", 
+                           "Anthracene", "Fluorene", "Naphthalene", "Phenanthrene",
+                           "Fluoranthene", "Pyrene", 
+                           "Benzo(a)anthracene", "Chrysene", 
+                           "Benzofluoranthene",  "Benzo(a)pyrene" ,
+                           "Indeno(1,2,3-cd)pyrene" , "Dibenzo(a,h)anthracene" , 
+                           "Benzo(g,h,i)perylene",
+                           "Benzo(b)fluoranthene",
+                           "Benzo(k)fluoranthene"   ),
+                   
+                   CLASS = c("LPAH","LPAH","LPAH",
+                             "LPAH", "LPAH","LPAH","LPAH",
+                             "HPAH", "HPAH",
+                             "HPAH", "HPAH",
+                             "HPAH", "HPAH",
+                             "HPAH", "HPAH",
+                             "HPAH", "CPAH", "CPAH"), stringsAsFactors=FALSE )
+# PAH LOOKUP will be used below
+PAH_LOOKUP <- PAH %>%
+  left_join(cPAH) %>% 
+  mutate(TYPE = ifelse(!is.na(PEF), "CPAH", "PAH" ))
+```
+### Define Output Function
+```{r functions , message = F, warnings = F, echo = T}
+#' output_EDD_from_sums_and_ref
+#' 
+#' the
+#'
+#' @param x.sum is a summary data.frame with sums
+#' @param x.ref is a reference data.frame with ancillary information about each sampleID
+#'
+#' @return
+#' @export
+#'
+#' @examples
+output_EDD_from_sums_and_ref<- function(x.sum, x.ref){
+  
+  ref_info <- x.ref %>% group_by(txtSampleID) %>% slice(1) %>% 
+    select(-txtConstituent, -txtCASID, -txtQual, -dblLimit, -dblResult)
+  
+  x1 <- x.sum %>% select(CLASS, txtSampleID, ND_zero, ND_half, ND_full,txtQual, maxLimit) %>%
+    gather(summation, dblResult, -CLASS, -txtSampleID, -txtQual, -maxLimit) %>% 
+    mutate(txtConstiuent = paste0(CLASS, "_", summation)) %>% ungroup()
+  
+  x2 <- x1 %>% left_join(ref_info)
+  
+  x3 <- x2 %>% transmute(PRJ_NAME  = txtProjectName,
+                         EVENT     = txtEvent,
+                         LAB_ID    = txtLabID,
+                         SAMPLE_DT = dtmSampleDate,
+                         ANALYSIS_METH  = txtAnalysisMethod,
+                         CONSTITUENT    = txtConstiuent,
+                         CAS_ID         = NA,
+                         P_CODE         = txtPCode,
+                         SAMPLE_ID      = txtSampleID,
+                         EXTRACTED_DATE = dtmExtractedDate,
+                         ANALYZED_DT    = dtmAnalyzedDate,
+                         DILUTION       = intDilution,
+                         RESULT         = dblResult,
+                         UNITS          = txtUnits,
+                         QUAL           = txtQual,
+                         LIMIT          = maxLimit,
+                         QA             = txtQA,
+                         COMMENTS       = txtComments)
+  
+  #change posix date format to MM/DD/YYY hh:mm character
+  x3$SAMPLE_DT<-as.character(x3$SAMPLE_DT, format='%m/%d/%y %H:%M')
+  x3$EXTRACTED_DATE<-as.character(x3$EXTRACTED_DATE, format='%m/%d/%y %H:%M')
+  x3$ANALYZED_DT<-as.character(x3$ANALYZED_DT, format='%m/%d/%y %H:%M')
+  #change NAs and NA characters to blanks
+  x3[is.na(x3)] <- ""
+
+  return(x3)
+}
+```
+
+### Database Query and Subsetting
+
+```{r load_data, message = F, warnings = F, echo = T}
+
+# Load data cleanly, subset to PAHs
+con2 <- RODBC::odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, query_string); close(con2)
+data <- data %>% dplyr::mutate_if(is.factor, as.character)
+d.PAH <- filter(data, txtConstituent %in% PAH_LOOKUP$PAH)
+```
+
+### Total LPAH, HPAH
+Note that these tidyverse operations work on both analyte results and lab qualifiers. 
+
+```{r lpah_and_hpah_sums, message = F, warnings = F, echo =T}
+# CALCULATE LPAH, HPAH SUMS
+LPAH.HPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH"))%>%
+  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblLimit, dblResult)) %>%
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult)) %>%
+  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblLimit, dblResult)) %>% 
+  filter(CLASS %in% c("LPAH","HPAH")) %>%
+  group_by(CLASS, txtSampleID) %>%
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+                         sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+                         sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+                         maxLimit = max(dblLimit), 
+                         n = n(),
+                         nd = sum(is.na(dblResult))) %>%
+  mutate(`ND_zero`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+            `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+            `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+
+x.QA <- d.PAH %>%
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH")) %>%
+  filter(CLASS %in% c("LPAH","HPAH")) %>% 
+  group_by(txtSampleID, CLASS) %>%
+  summarise( txtQualT = toString( unique(txtQual), sep = "")) 
+# [x.flags] collects all unique flags for a given sample (e.g BJq)
+x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>%
+  #stringr::str_replace_all( pattern ="C", replacement = "") %>% 
+  stringr::str_replace_all( pattern =" +", replacement = "-") %>% 
+  stringr::str_split(pattern = "-") %>%
+  lapply(function(x) unique(x)) %>%
+  lapply(function(x) sort(x)) %>%
+  lapply(function(x) toString(x)) %>% 
+  stringr::str_replace_all( pattern =",", replacement = "") %>%
+  stringr::str_replace_all( pattern =" ", replacement = "") %>%
+  stringr::str_replace_all( pattern ="U", replacement = "") %>%
+  stringr::str_replace_all( pattern ="C", replacement = "") %>%
+  paste0("T") %>%
+  stringr::str_replace_all( pattern ="NA", replacement = "")
+
+if (length(x.flags) == dim(LPAH.HPAH.sums)[1]){
+  LPAH.HPAH.sums$txtQual <- x.flags
+}else{
+    stop("Error due to mismatch in number of sums and total flags")
+}
+```
+
+### Total cPAHs
+Total cPAHs as benzo(a)pyrene (BaP) equivalent (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)
+```{r cpah_sums, message = F, warnings = F, echo =T}
+CPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH"))%>%
+  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblLimit, dblResult*PEF)) %>%
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult*PEF)) %>%
+  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblLimit, dblResult*PEF)) %>% 
+  filter(TYPE %in% c("CPAH")) %>%
+  group_by(TYPE, txtSampleID) %>%
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+            sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+            sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+            maxLimit = max(dblLimit), 
+            n = n(),
+            nd = sum(is.na(dblResult))) %>%
+  mutate(`ND_zero`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+         `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+         `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND)) %>%
+  mutate(CLASS = TYPE) %>% ungroup()
+
+
+x.QA <- d.PAH %>%
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH")) %>%
+  filter(TYPE %in% c("CPAH"))  %>% 
+  group_by(TYPE, txtSampleID) %>%
+  summarise( txtQualT = toString( unique(txtQual), sep = "")) 
+# [x.flags] collects all unique flags for a given sample (e.g BJq)
+x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>%
+  #stringr::str_replace_all( pattern ="C", replacement = "") %>% 
+  stringr::str_replace_all( pattern =" +", replacement = "-") %>% 
+  stringr::str_split(pattern = "-") %>%
+  lapply(function(x) unique(x)) %>%
+  lapply(function(x) sort(x)) %>%
+  lapply(function(x) toString(x)) %>% 
+  stringr::str_replace_all( pattern =",", replacement = "") %>%
+  stringr::str_replace_all( pattern =" ", replacement = "") %>%
+  stringr::str_replace_all( pattern ="U", replacement = "") %>%
+  stringr::str_replace_all( pattern ="C", replacement = "") %>%
+  paste0("T") %>%
+  stringr::str_replace_all( pattern ="NA", replacement = "")
+
+if (length(x.flags) == dim(CPAH.sums)[1]){
+  CPAH.sums$txtQual <- x.flags
+}else{
+  stop("Error due to mismatch in number of sums and total flags")
+}
+```
+
+
+
+### Execute the outputs function to write external EDD file #
+```{r output_edd, message = F, warnings = F, echo = T}
+x4 <- output_EDD_from_sums_and_ref(x.sum = LPAH.HPAH.sums,
+                               x.ref = d.PAH)
+x5 <- output_EDD_from_sums_and_ref(x.sum = CPAH.sums,
+                                   x.ref = d.PAH)
+x5$COMMENTS <- "CPAH (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)"
+
+x6 <- rbind(x4,x5)
+
+db_name <- stringr::str_replace(db, "L:/", "") %>% 
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+
+write.table(x6, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+```
+
+### Preview Output
+```{r preview, message = F, warnings = F, echo = T}
+head(x6)
+```
+
+
