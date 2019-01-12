@@ -1,0 +1,6 @@
+### Input Checks 
+
+#### This file will implement checks of the database query
+
+##### enforce standard names 
+##### enforece complete analyte list
