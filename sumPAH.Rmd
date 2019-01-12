@@ -101,7 +101,7 @@ benzo(a)anthracene, chrysene, benzo(b)fluoranthene, benzo(k)fluoranthene, benzo(
 
 ```{r definitions, message = F, warnings = F, echo =T}
 
-cPAH <- data.frame( PAH = c("Benz(a)anthracene",
+cPAH <- data.frame( PAH = c("Benzo(a)anthracene",
                              "Benzo(a)pyrene",
                               "Benzo(b)fluoranthene",
                               "Benzo(k)fluoranthene",
