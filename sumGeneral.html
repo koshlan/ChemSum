@@ -325,7 +325,7 @@ general_analytical_summary &lt;- function(df){
 #' @return x3 - data.frame with summation results in EDD format
 output_EDD_from_sums_and_ref&lt;- function(x.sum, x.ref){
   
-  ref_info &lt;- x.ref %&gt;% group_by(txtSampleID) %&gt;% slice(1) %&gt;% 
+  ref_info &lt;- x.ref %&gt;% group_by(txtSampleID, CLASS) %&gt;% slice(1) %&gt;% 
     select(-txtConstituent, -txtCASID, -txtQual, -dblLimit, -dblResult)
   
   x1 &lt;- x.sum %&gt;% select(CLASS, txtSampleID, ND_zero, ND_half, ND_full,txtQual, maxLimit) %&gt;%
@@ -479,7 +479,7 @@ R &lt;- output_EDD_from_sums_and_ref(x.sum = S, x.ref = DDdte) </code></pre>
 ## 5 Swan Isl~ Phas~ ALS    10/20/18~ ALS SOP       Total DDD_~ &quot;&quot;     &quot;&quot;    
 ## 6 Swan Isl~ Phas~ ALS    10/14/18~ ALS SOP       Total DDD_~ &quot;&quot;     &quot;&quot;    
 ## # ... with 10 more variables: SAMPLE_ID &lt;chr&gt;, EXTRACTED_DATE &lt;chr&gt;,
-## #   ANALYZED_DT &lt;chr&gt;, DILUTION &lt;chr&gt;, RESULT &lt;dbl&gt;, UNITS &lt;chr&gt;,
+## #   ANALYZED_DT &lt;chr&gt;, DILUTION &lt;int&gt;, RESULT &lt;dbl&gt;, UNITS &lt;chr&gt;,
 ## #   QUAL &lt;chr&gt;, LIMIT &lt;dbl&gt;, QA &lt;chr&gt;, COMMENTS &lt;chr&gt;</code></pre>
 </div>
 <div id="write-output-to-.txt-file" class="section level4">

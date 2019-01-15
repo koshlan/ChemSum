@@ -137,7 +137,7 @@ general_analytical_summary <- function(df){
 #' @return x3 - data.frame with summation results in EDD format
 output_EDD_from_sums_and_ref<- function(x.sum, x.ref){
   
-  ref_info <- x.ref %>% group_by(txtSampleID) %>% slice(1) %>% 
+  ref_info <- x.ref %>% group_by(txtSampleID, CLASS) %>% slice(1) %>% 
     select(-txtConstituent, -txtCASID, -txtQual, -dblLimit, -dblResult)
   
   x1 <- x.sum %>% select(CLASS, txtSampleID, ND_zero, ND_half, ND_full,txtQual, maxLimit) %>%
