@@ -1,0 +1,339 @@
+#### Run the general summary functions
+```{r, echo = T, warning = F, message = F}
+
+# The Task:
+  # For each CLASS of chemicals (e.g. Aroclors by method SW8082A)
+  # a summary sample result is generated that complies with 
+  # agency specific summation rule, which usually are concerned with 
+  # how to account for results below the analytical limit of detection (DL).
+  
+  # A dblResult can be a number OR NA
+  # every dblResult has an associated string flag OR NA
+  # If a result is NA, we consider it as a concentration of 0, 1/2DL, or DL
+  
+  # We also keep track of all the unique flags that went into a summary
+  
+  # For book keeping we must keep track of:
+    # (1) the number of dblresults of each CLASS, 
+    # (2) the number of NA dblresult below the Detection Limit.
+    # Additionally, if the number of results per sample, within any sample CLASS differ, 
+    # that is an unexpected result, indicating an incomplete or unbalanced input file
+    # It should cause the routine to stop. an easy test would be:
+    # group_by(txtSample, CLASS) %>% 
+      # summarise(n=n()) %>% 
+      # ungroup() %>% 
+      # group_by(CLASS) %>% 
+      # summarise(Failure = (var(n)>0))
+
+
+# BELOW ARE FUNCTIONS for reducing the data qualification flags 
+  # to contain only unique information. 
+  # Lab data comes with alphanumeric qualifications.
+  # When summing multiple analytes, we must generate a summary flag 
+  # consisting of the all the unique flags in the group plus a big "T"
+  # to designate the result an aggregate Total.
+  # By defining a set of concise helper functions 
+  # this task can slide alongside the task 
+  # of summarising analytical result values if
+  # placed directly into a dplyr group_by() %>% summarise() 
+  # data manipulation.
+  # Note the insertion of this task in 
+  # the final line of the summarise() function 
+  # in the general_analytical_summary() function
+
+
+# given any string turn return an alphabetal list of unique single charcters
+get_unique_chars         <- function(x) {sort(unique(strsplit(x, "")[[1]]))}
+
+# collapse a vector of strings toa single string
+collapse_list_of_chars   <- function(x) {paste(x, collapse = "")}
+
+# append a special character flag to a strin
+append_special_flag      <- function(x, special = "T") {paste(x,special, sep = "")}
+
+# remove all instances of a special character from a string
+remove_special_flag      <- function(x, special = "NA") {
+  stringr::str_replace_all(x, pattern =special, replacement = "")
+}
+
+# return all all unique flags
+return_all_unique_flags <- function(x) {
+  result <- collapse_list_of_chars(sort(unique(x))) %>%
+    remove_special_flag("NA") %>%
+    remove_special_flag("U") %>% 
+    get_unique_chars() %>%
+    collapse_list_of_chars() %>%
+    append_special_flag("T")
+  return(result) 
+}
+
+#' general_analytical_summary
+#'
+#' General purpose summary function for analytical results.
+#' 
+#' @param df input data.frame object must contain columns:
+#' CLASS, txtConstituent, txtSampleID, dblResult, dblLimit, txtQual
+#'
+#' @return df.sums output data.frame
+general_analytical_summary <- function(df){
+  df.sums <- df %>% select(CLASS,
+                           txtConstituent,
+                           txtSampleID, 
+                           dblResult, 
+                           dblLimit, 
+                           txtQual) %>% 
+    mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblLimit,   dblResult)) %>%
+    mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult)) %>%
+    mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblLimit,   dblResult)) %>% 
+    group_by(CLASS, txtSampleID) %>%
+    summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+              sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+              sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+              maxLimit         = max(dblLimit), 
+              n                = n(),
+              nd               = sum(is.na(dblResult)),
+              txtQual       = return_all_unique_flags(txtQual) ) %>%
+    mutate(`ND_zero` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+           `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+           `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+  return(df.sums)
+}
+
+
+#' output_EDD_from_sums_and_ref
+#'
+#' @param x.sum a data.frame with column names
+#'   "txtSampleID", 
+#'   "sumResult_0ND", 
+#'   "sumResult_halfND", 
+#'   "sumResult_fullND", 
+#'   "maxLimit", 
+#'   "n", 
+#'   "nd", 
+#'   "ND_zero", 
+#'   "ND_half", 
+#'   "ND_full", 
+#'   "txtQual", 
+#'   "CLASS"
+#' @param x.ref a data.frame with other sample information which will be joined. It must contain the following headers to avoid an error
+#'    txtProjectName
+#'    txtEvent
+#'    txtLabID
+#'    dtmSampleDate
+#'    txtAnalysisMethod
+#'    txtConstiuent
+#'    txtPCode
+#'    txtSampleID
+#'    dtmExtractedDate
+#'    dtmAnalyzedDate
+#'    intDilution
+#'    dblResult
+#'    txtUnits
+#'    txtQual
+#'    maxLimit
+#'    txtQA
+#'    txtComments
+#'
+#' @return x3 - data.frame with summation results in EDD format
+output_EDD_from_sums_and_ref<- function(x.sum, x.ref){
+  
+  ref_info <- x.ref %>% group_by(txtSampleID) %>% slice(1) %>% 
+    select(-txtConstituent, -txtCASID, -txtQual, -dblLimit, -dblResult)
+  
+  x1 <- x.sum %>% select(CLASS, txtSampleID, ND_zero, ND_half, ND_full,txtQual, maxLimit) %>%
+    gather(summation, dblResult, -CLASS, -txtSampleID, -txtQual, -maxLimit) %>% 
+    mutate(txtConstiuent = paste0(CLASS, "_", summation)) %>% ungroup()
+  
+  x2 <- x1 %>% left_join(ref_info)
+  
+  x3 <- x2 %>% transmute(PRJ_NAME  = txtProjectName,
+                         EVENT     = txtEvent,
+                         LAB_ID    = txtLabID,
+                         SAMPLE_DT = dtmSampleDate,
+                         ANALYSIS_METH  = txtAnalysisMethod,
+                         CONSTITUENT    = txtConstiuent,
+                         CAS_ID         = NA,
+                         P_CODE         = txtPCode,
+                         SAMPLE_ID      = txtSampleID,
+                         EXTRACTED_DATE = dtmExtractedDate,
+                         ANALYZED_DT    = dtmAnalyzedDate,
+                         DILUTION       = intDilution,
+                         RESULT         = dblResult,
+                         UNITS          = txtUnits,
+                         QUAL           = txtQual,
+                         LIMIT          = maxLimit,
+                         QA             = txtQA,
+                         COMMENTS       = txtComments)
+  
+  #change posix date format to MM/DD/YYY hh:mm character
+  x3$SAMPLE_DT<-as.character(x3$SAMPLE_DT, format='%m/%d/%y %H:%M')
+  x3$EXTRACTED_DATE<-as.character(x3$EXTRACTED_DATE, format='%m/%d/%y %H:%M')
+  x3$ANALYZED_DT<-as.character(x3$ANALYZED_DT, format='%m/%d/%y %H:%M')
+  #change NAs and NA characters to blanks
+  x3[is.na(x3)] <- ""
+  return(x3)
+}
+```
+# PCB Aroclors
+
+#### Setup a Tidy Environment
+```{r, echo = T, warning = F, message = F}
+require(dplyr)
+require(knitr)
+require(tidyr)
+require(RODBC)
+```
+
+
+This workflow is approrpiate for analtical summaries that don't require a toxicity adjustment factor.
+The heavy lifting should be in the resuable functions above, 
+This greatly simplies the entire work flow and encourages code resusability.
+
+#### Load Data
+```{r, echo = T, warning = F, message = F}
+db   <- "L:/DTNA/PGG_SedDB_2018_SQL.mdb"
+query_string = "SELECT * FROM ExR_2bSUM_All"
+output_suffix = "SUMAROCLOR_2018_10_13.txt"  
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, query_string) 
+data <- data %>% mutate_if(is.factor, as.character)
+close(con2)
+```
+
+#### Subset the data and avoid any result with "T" flag
+```{r, echo = T, warning = F, message = F}
+A <- data %>% filter(txtAnalysisMethod == "SW8082A", !grepl(txtQual, pattern = "T")) 
+#### Subset the data
+```
+
+#### Assign a CLASS or CLASSes to summarize over
+```{r, echo = T, warning = F, message = F}
+# Assign a class, for Aroclors you might choose "Total Aroclors" or "TotalSW8082A"
+# If you want to do more complex summations, you can do by assigning as many CLASSes as
+# you like.
+A$CLASS <-"Total Aroclors"
+```
+
+### Run the general analytical summary function
+```{r, echo = T, warning = F, message = F}
+S = general_analytical_summary(A)
+R <- output_EDD_from_sums_and_ref(x.sum = S, x.ref = A) 
+```
+
+### Preview Output
+```{r, echo = T, warning = F, message = F}
+head(R)
+```
+
+### Write output to txt file
+```{r, echo = T, warning = F, message = T}
+db_name <- stringr::str_replace(db, "L:/", "") %>%
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+message( sprintf("Writing to file: %s",paste0(db_name, output_suffix)))
+write.table(R, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+```
+
+
+# DDD, DDT, and DDE
+
+#### Load Data
+```{r, echo = T, warning = F, message = F}
+db   <- "L:/DTNA/PGG_SedDB_2018_SQL.mdb"
+query_string = "SELECT * FROM ExR_2bSUM_All"
+output_suffix = "SUMDDdte_2018_10_13.txt"  
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, query_string) 
+data <- data %>% mutate_if(is.factor, as.character)
+close(con2)
+```
+
+#### Subset the data and avoid any result with "T" flag
+```{r, echo = T, warning = F, message = F}
+
+DD <- data %>% mutate_if(is.factor, as.character) %>% 
+  filter(txtConstituent %in% c("o,p'-DDD", "4,4'-DDD", "o,p-DDE","4,4'-DDE", "o,p'-DDT",  "4,4'-DDT"),
+         !grepl(txtQual, pattern = "T"))
+         
+         
+
+```
+
+#### Assign a CLASS or CLASSes to summarize over
+```{r, echo = T, warning = F, message = F}
+# Assign a class, for Aroclors you might choose "Total Aroclors" or "TotalSW8082A"
+# If you want to do more complex summations, you can do by assigning as many CLASSes as
+# you like.
+
+DDdte <- DD %>% mutate(CLASS = 
+                      ifelse(txtConstituent %in% c("o,p'-DDD", "4,4'-DDD"), "Total DDD", 
+                        ifelse(txtConstituent %in% c("o,p'-DDE", "4,4'-DDE"), "Total DDE", 
+                          ifelse(txtConstituent %in% c("o,p'-DDT", "4,4'-DDT"), "Total DDT", NA)
+                              )
+                            )
+                    )
+
+
+
+
+```
+
+#### Run the general analytical summary function
+```{r, echo = T, warning = F, message = F}
+S = general_analytical_summary(DDdte)
+R <- output_EDD_from_sums_and_ref(x.sum = S, x.ref = DDdte) 
+```
+
+#### Preview Output
+```{r, echo = T, warning = F, message = F}
+head(R)
+```
+
+#### Write output to .txt file
+```{r, echo = T, warning = F, message = T}
+db_name <- stringr::str_replace(db, "L:/", "") %>%
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+message( sprintf("Writing to file: %s",paste0(db_name, output_suffix)))
+write.table(R, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+```
+
+
+# Total DDx
+
+#### To show how simplified the work flow, here is Total DDx in ONE CHUNK
+```{r, echo = T, warning = F, message = T}
+output_suffix = "SUMDDx_2018_10_13.txt"
+DDx <- DD %>% mutate(CLASS = "Total DDx")
+S = general_analytical_summary(DDx)
+R <- output_EDD_from_sums_and_ref(x.sum = S, x.ref = DDx)
+db_name <- stringr::str_replace(db, "L:/", "") %>%
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+message( sprintf("Writing to file: %s",paste0(db_name, output_suffix)))
+write.table(R, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+
+```
+
+
+```{r, echo = T, warning = F, message = F, include = F}
+# test that, all unique_flags( c("a", NA,"b","a")) == 'abT'
+# test that, all_unique_flags(c(NA, NA,NA,NA)) = 'abT'
+# test that,all_unique_flags(c("b", NA,"b","a")) = 'abT'
+# test that all_unique_flags(c("1", NA,"b","a")) = '1abT'
+# test that all_unique_flags(c("ca", NA,"db","ac")) = '1abT'
+#all_unique_flags(c("ca", NA,"db","ac"))
+# all_unique_flags( c("a", NA,"b","a")) 
+```
