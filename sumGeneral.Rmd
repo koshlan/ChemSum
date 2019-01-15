@@ -135,7 +135,7 @@ general_analytical_summary <- function(df){
 #'    txtComments
 #'
 #' @return x3 - data.frame with summation results in EDD format
-output_EDD_from_sums_and_ref<- function(x.sum, x.ref){
+output_EDD_from_sums_and_ref<- function(x.sum, x.ref, my_signif = 2){
   
   ref_info <- x.ref %>% group_by(txtSampleID, CLASS) %>% slice(1) %>% 
     select(-txtConstituent, -txtCASID, -txtQual, -dblLimit, -dblResult)
@@ -164,7 +164,8 @@ output_EDD_from_sums_and_ref<- function(x.sum, x.ref){
                          LIMIT          = maxLimit,
                          QA             = txtQA,
                          COMMENTS       = txtComments)
-  
+  # apply significant figures to result
+  x3$RESULT <- signif(x3$RESULT, my_signif)
   #change posix date format to MM/DD/YYY hh:mm character
   x3$SAMPLE_DT<-as.character(x3$SAMPLE_DT, format='%m/%d/%y %H:%M')
   x3$EXTRACTED_DATE<-as.character(x3$EXTRACTED_DATE, format='%m/%d/%y %H:%M')
