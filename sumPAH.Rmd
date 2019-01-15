@@ -308,7 +308,7 @@ x5 <- output_EDD_from_sums_and_ref(x.sum = CPAH.sums,
 x5$COMMENTS <- "CPAH (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)"
 
 x6 <- rbind(x4,x5)
-
+x6$RESULT <- signif(x6$RESULT,2 )
 db_name <- stringr::str_replace(db, "L:/", "") %>% 
   stringr::str_replace("/", "_") %>% 
   stringr::str_replace(".mdb", "_")
