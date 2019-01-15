@@ -246,6 +246,7 @@ if (length(x.flags) != dim(x.sum)[1]){
 ```{r format_output}
 x.sum$CLASS = "Total_PCB"
 results <- output_EDD_from_sums_and_ref(x.sum=x.sum, x.ref=dPCB )
+results$RESULT <- signif(results$RESULT, 2)
 db_name <- stringr::str_replace(db, "L:/", "") %>%
   stringr::str_replace("/", "_") %>% 
   stringr::str_replace(".mdb", "_")
