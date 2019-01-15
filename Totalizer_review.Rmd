@@ -1,0 +1,579 @@
+---
+title: "Technical Memorandum"
+output: 
+  word_document:
+    reference_docx: TechnicalMemorandum_bug.docx
+indent: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#library("lubridate")
+library("dplyr")
+library(knitr)
+library(tidyr)
+library("RODBC")
+
+sysD<-format(Sys.Date(),"%B %d, %Y")
+```
+<div custom-style="header_block_first">
+To: Jennifer Sanscrainte	
+</div>
+
+<div custom-style="header_block">
+From: Jeff Parker and Koshlan Mayer-Blackwell	
+
+Re: Data Summation, Swan Island Lagoon
+</div>
+
+<div custom-style="header_block_last">
+Date:	`r sysD`
+</div>
+
+# Introduction
+<div custom-style="body_text1">
+Certain data products (e.g. Total PCBs and Total PCB Aroclors) require the aggregation of multiple laboratory analyte results according to specific data summation rules. This technical memorandum documents the import of laboratory data and the rules used to summarize the data. This document records the rules used to export analyte sums as they are stored in the PGG Swan Island Lagoon (SIL) database and as they will appear in PGG elecronic data deliverable (EDD) formatted text files. 
+</div>
+
+# Data Import
+<div custom-style="body_text1">
+The data for individual analytes are queried from the PGG Access database. A reproducible query command is stored in the Access database to generate individual analyte results used as input to calculate summary analytes values.
+</div>
+
+```{r data import, echo=FALSE}
+#####for 32-bit R and 32-bit DSN drivers######
+#####IF ODBC doesn't work, make sure 32-bit R. CTRL on start lets you select version#######
+
+###You will need to set up the query in the database before running this code.
+
+db <- "L:/DTNA/PGG_SedDB_2018.mdb"
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data<-sqlQuery(con2, "SELECT * FROM ExR_2bSUM")
+close(con2)
+```
+
+## Data Summary
+<div custom-style="body_text1">
+The following data were imported from the PGG SIL database via a direct query, as summarized here:
+
+</div>
+
+```{r data summary, echo=FALSE, message = FALSE, warning = FALSE}
+Table1 <- data %>% 
+  group_by(txtLabBatch, 
+           txtAnalysisMethod) %>% 
+  summarise( Total = n(),
+             Detects = sum(dblResult >0, na.rm = T),
+             `Non-Detects` = sum(is.na(dblResult) ) ) %>%
+  select(`Laboratory Batch`  =  txtLabBatch,
+         `Analytical Method` =  txtAnalysisMethod,
+         Total, 
+         Detects,
+         `Non-Detects`)
+
+kable(Table1, caption = "Table 1. Count of Individual Analytes reported by Batch and by Analytical Method") 
+
+```
+
+<div custom-style="body_text3">
+
+<br><br/> 
+
+**Method 1668A** - PCB Congener Analysis
+
+**Method 8082A** - PCB Aroclors
+
+**ALS Environmental Standard Operating Procedure (ALS SOP)** - 2,4'-DDD, 2,4'-DDE, 2,4'-DDT, 4,4'-DDD, 4,4'-DDE, 4,4'-DDT, Aldrin, alpha-Chlordane, cis-Nonachlor, Dieldrin, gamma-BHC (Lindane), gamma-Chlordane, Heptachlor, Oxychlordane, trans-Nonachlor,and Tri-n-butyltin Cation.
+</div>
+
+
+
+
+#Calculated Totals
+<div custom-style="body_text1">
+This section concerns summation rules. Different major EPA Portland Harbor studies have used different summation rules for the handling results below laboratory detection limits. For instance, the summation rules used to produce the Final Remedial Investigation (RI) and (ii) Baseline Risk Assessment (BERA) Data Sets differed (EPA, 2016 Appendix A3, Section 3.1). PGG database includes calculate parameter totals (e.g. Total PCBs, Total PCB Aroclors) using the summation methods used in the RI and BERA studies. Section 3.1 summarizes the major differences between the alternative summation rules.  
+</div>
+
+## General Summation Rules
+<div custom-style="body_text1">
+Final RI data set summation rules are as follows:
+</div>
+
+<div custom-style="bullet1">
+Calculated totals are the sum of all detected concentrations; non-detected concentrations are treated as zero.
+
+If all analytes for a total are not detected, then the highest detection limit is used for the summation.
+</div>
+
+<div custom-style="body_text1">
+Final baseline risk assessment summation rules are as follows:
+</div>
+
+<div custom-style="bullet1">
+Calculated totals are the sum of all detected concentrations; non-detected concentrations are treated as at one-half the detection limit.
+
+If all analytes for a total are not detected, then the highest detection limit is used for the summation.
+</div>
+
+```{r Aroclor List, echo=FALSE}
+
+Aroclor<-data %>%
+  filter(txtAnalysisMethod == "8082A") %>% 
+  distinct(txtConstituent) 
+
+arCount<-nrow(Aroclor)
+
+AroclorList <- paste(paste(Aroclor$txtConstituent[1:nrow(Aroclor)-1], sep = ',',collapse = ", "), ", and ", Aroclor$txtConstituent[nrow(Aroclor)], sep = '')
+
+```
+
+
+###Total PCB Aroclors (RI Method)
+<div custom-style="body_text1">
+Total PCB Aroclors represent the sum of all reported Aroclors. Reported Aroclors include `r AroclorList`.
+</div>
+
+```{r ex Aroclor Total, echo=FALSE, message = FALSE}
+#create the Total Aroclor sum NDs = 0, all NDs = max(Limit).
+AroclorRIsum<-data %>%
+  filter(txtAnalysisMethod == "8082A") %>% 
+  group_by(txtSampleID) %>%   
+  summarise(sumResult = sum(dblResult, na.rm=TRUE), maxLimit = max(dblLimit)) #, count=sum(is.na(dblResult)))  
+  
+##This is the Data Use Rule: sum of detections, if no detects, maxLimit.
+AroclorRIsum<-mutate(AroclorRIsum,Total_Aroclor = ifelse(sumResult == 0, maxLimit, sumResult))
+
+##Get the qualifiers
+AroclorQ<-data %>%
+  filter(txtAnalysisMethod == "8082A", !grepl(pattern = "U", txtQual), !is.na(txtQual)) %>% 
+  group_by(txtSampleID) %>% 
+  distinct(txtQual)
+
+#create the data for the EDD (created at the end of the script)
+AroclorRI<-data %>%
+  filter(txtAnalysisMethod == "8082A") %>%
+  group_by( txtSampleID ) %>%
+    distinct(txtProjectName, txtEvent, txtLAB_ID,  dtmSampleDate, txtAnalysisMethod, txtSampleID, dtmExtractedDate, dtmAnalyzedDate, intDilution, txtLabBatch)
+
+AroclorRI <-left_join(AroclorRI, AroclorRIsum)
+AroclorRI <-left_join(AroclorRI, AroclorQ)
+
+#create the correct qualifier for the result with "T" totals
+#probably concat is better than paste, so "NAs" do not become characters
+AroclorRI<-mutate(AroclorRI,txtQual = ifelse(sumResult == 0, paste("U",(txtQual), "T", sep = " "), paste((txtQual), "T", sep = " ")))
+AroclorRI$txtQual<-gsub(paste("NA","",sep=""),"", AroclorRI$txtQual)
+AroclorRI$txtConstituent<- "Total_PCB_Aroclors_ND-zero"
+
+
+```
+
+```{r Memo table 2, echo=FALSE, message = FALSE}
+##FOr Memo Display Only###
+#create a cross-tab of Aroclors to show in report with sum
+AroclorX<-data %>%
+  filter(txtAnalysisMethod == "8082A") %>% 
+  group_by(txtSampleID) %>% 
+  select(txtSampleID, dtmSampleDate, txtConstituent, dblResult) %>% 
+  filter(!txtConstituent %in%  c("Aroclor 1016", "Aroclor 1221", "Aroclor 1232", "Aroclor 1242")) # KMB ADDED THESE BECAUSE TABLE LOOKS BAD WITH SO MANY NAS 
+
+#cross-tab
+AroclorX<-spread(AroclorX, txtConstituent, dblResult)
+
+#join total to individual aroclors
+AroclorX<-left_join(AroclorX, AroclorRIsum)
+# Make a readable table 2
+Table2 <-AroclorX %>% select(-dtmSampleDate) %>% select(`Sample ID` = txtSampleID,
+                                                        `1248`= `Aroclor 1248`,
+                                                        `1254`= `Aroclor 1254`,
+                                                        `1260`= `Aroclor 1260`,
+                                                        Sum = sumResult,
+                                                        `Max Limit` = maxLimit,
+                                                        `Total PCB Aroclors (RI)` = Total_Aroclor
+                                                        )
+
+
+#show head of table 
+kable(head(Table2), caption = "Table 2. Example Individual Aroclor Concentrations and Calculated Total PCB Aroclors (RI Method)") 
+```
+
+<div custom-style="body_text3">
+
+<br><br/> 
+
+**Total PCB Aroclors** Only common Aroclors 1248, 1254, and 1260 results are shown here. Sums reflect concentration of all reported Aroclors.
+</div>
+
+
+### Total PCB Aroclors (BERA Method)
+
+```{r, BERA Aroclor Total, echo=FALSE, message = FALSE}
+
+
+# Fully dplyr method no function
+AroclorBERAsum <-data %>%
+  filter(txtAnalysisMethod == "8082A") %>% 
+  group_by(txtSampleID) %>%   
+  mutate(BERASUM2 = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult)) %>%
+  summarise(sumResult = sum(BERASUM2, na.rm = T), maxLimit = max(dblLimit)) #, count=sum(is.na(dblResult)))  
+
+AroclorBERAsum <- mutate(AroclorBERAsum, Total_Aroclor = ifelse(sumResult == 0, maxLimit, sumResult))
+
+#Get the qualifiers ????????? (This needs to be documented better and has a potential problem see review notes)
+
+# Filter based on method, those results without "U" flags, and where flags are not NA
+# Then group by sample ID
+# Then report distinct
+
+AroclorQ<-data %>%
+   filter(txtAnalysisMethod == "8082A", !grepl(pattern = "U", txtQual), !is.na(txtQual)) %>% 
+   group_by(txtSampleID) %>% 
+   distinct(txtQual)
+
+#create the data for the EDD (created at the end of the script)
+AroclorBERA<-data %>%
+   filter(txtAnalysisMethod == "8082A") %>%
+   group_by( txtSampleID ) %>%
+   distinct(txtProjectName, txtEvent, txtLAB_ID,  dtmSampleDate, txtAnalysisMethod, txtSampleID, dtmExtractedDate, dtmAnalyzedDate, intDilution, txtLabBatch)
+ 
+AroclorBERA <-left_join(AroclorBERA, AroclorBERAsum)
+AroclorBERA <-left_join(AroclorBERA, AroclorQ) # !!!!!!!! THIS JOIN WILL potentially create multiple rows for each sampleID based on qualifier flags
+
+# #create the correct qualifier for the result with "T" totals
+# #probably concat is better than paste, so "NAs" do not become characters
+AroclorBERA                <- mutate(AroclorBERA, txtQual = ifelse(sumResult == 0, paste("U",(txtQual), "T", sep = " "), paste((txtQual), "T", sep = " ")))
+AroclorBERA$txtQual        <- gsub(paste("NA","",sep=""),"", AroclorRI$txtQual)
+AroclorBERA$txtConstituent <- "Total_PCB_Aroclors_ND-half"
+```
+
+
+
+```{r, Memo table 3 , echo=FALSE, message = FALSE}
+AroclorX<-data %>%
+  filter(txtAnalysisMethod == "8082A") %>% 
+  group_by(txtSampleID) %>% 
+  select(txtSampleID, dtmSampleDate, txtConstituent, dblResult) %>% 
+  filter(!txtConstituent %in%  c("Aroclor 1016", "Aroclor 1221", "Aroclor 1232", "Aroclor 1242")) # KMB ADDED THESE BECAUSE TABLE LOOKS BAD WITH SO MANY NAS 
+
+#cross-tab
+AroclorX<-spread(AroclorX, txtConstituent, dblResult)
+
+#join total to individual aroclors
+AroclorXBERA<-left_join(AroclorX, AroclorBERAsum)
+
+
+AroclorXBERA$Total_Aroclor <- round(AroclorXBERA$Total_Aroclor,1)
+# Make a readable table 3
+Table3 <-AroclorXBERA %>% select(-dtmSampleDate) %>% select(`Sample ID` = txtSampleID,
+                                                        `1248`= `Aroclor 1248`,
+                                                        `1254`= `Aroclor 1254`,
+                                                        `1260`= `Aroclor 1260`,
+                                                        Sum = sumResult,
+                                                        `Max Limit` = maxLimit,
+                                                        `Total PCB Aroclors (BERA)` = Total_Aroclor
+                                                        )
+
+
+
+kable(head(Table3), caption = "Table 3. Example Individual Aroclor Concentrations and Calculated Total PCB Aroclors (BERA Method)") 
+
+```
+
+
+<div custom-style="body_text3">
+
+<br><br/> 
+
+**Total PCB Aroclors** Only common Aroclors 1248, 1254, and 1260 results are shown here. Sums reflect concentration of all reported Aroclors.
+</div>
+
+
+### Total PCB Congeners
+<div custom-style="body_text1">
+Table 4 shows Total PCBs based on summing individual congeners according to the RI and BERA summation rules. PGG also converted the Test America Laboratory format which includes all 209 PCB congeners, with duplicate results for co-eluting congeners, into standard reporting format without duplicate concentrations. For instance PCB-100 has a flag C93 which indicates that it co-elutes with the congener PCB-93. PGG reformatted the data so that both congeners are reported as a single value PCB-93+100. This crucial step avoids double counting co-eluting congener mass during the summation process.
+
+<br><br/> 
+</div>
+
+
+```{r PCB_Congener_Sums, echo=FALSE, message = FALSE}
+
+##### PCB CONGENERS ######
+
+# RI aggregates the Total PCB as Sum of individual congeners, NDs are treated as 0, if all congeners are NDs, then max(dblLimit)
+# BERA treats ND as half the detection limit
+# Congeners coelute and should not be doubled counted
+
+#' convert_to_coelution_reporting_format
+#' 
+#' PCB-100, with flag C93 implies that PCB-100 coelutes with C93, we want a single concentration for  PCB-93+100 to avoid double counting
+#'    
+#'    This function converts the Test America Flag format to the classic pattern PCB-10+14#'    input must contain:
+#'    txtConstituent
+#'    txtQual with Coelution format as "C([0-9]+)"
+#' 
+#' @param df 
+#'
+#' @return output (df with a new column PCBs that includes the coeluting congeners with plus signs, like PCB-4+10 )
+convert_to_coelution_reporting_format <- function(df){
+  m <- as.data.frame(cbind(df$txtConstituent, stringr::str_match(df$txtQual, pattern = "C([0-9]+)")), stringsAsFactors = F)
+  m$V3 <- as.numeric(m$V3)
+  m$V4 <- as.numeric(stringr::str_replace(m$V1, pattern = "PCB-", replacement = ""))
+  m$ORIGINAL <- df$txtConstituent
+  m <- m[order(m$V4),]
+  for(i in 1:dim(m)[1]){
+    coelution <- m$V3[i]
+    if (!is.na(coelution)){
+      ind = which(m$V4 == coelution)
+      m$V1[ind] <- paste(m$V1[ind], m$V4[i], sep = "+")
+    }
+  }
+  table <- data.frame(ORIGINAL = m$ORIGINAL, PCB= m$V1 , stringsAsFactors = F)
+  output <-  left_join(df, table, by = c("txtConstituent" = "ORIGINAL"))
+  return(output)
+}
+
+#' process
+#' this is a wrapper function for convert_to_coelution_reporting_format(), 
+#  it also sorts congener in ascending order
+#
+#' @param df 
+#'
+#' @return 
+process <- function(df){
+  df2 <- convert_to_coelution_reporting_format(df) # Produces new PCB label PCB-Z+X+Y
+  df3 <- df2[!grepl(df2$txtQual, pattern = "C[0-9]+"),] # Drops all samples that were reported as a coelution with Z
+  df3$SORTBY <- as.numeric(stringr::str_replace(df3$txtConstituent, pattern = "PCB-", replacement = "")) # extracts a numeric congener values to sort by
+  df4 <- arrange(df3, SORTBY) # sorts so PCB-20 comes before PCB-100 
+  return(df4)
+}
+
+
+# Load data cleanly Load
+db <- "L:/DTNA/PGG_SedDB_2018.mdb"
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data<-sqlQuery(con2, "SELECT * FROM ExR_2bSUM"); close(con2)
+
+# [PCB] Select only PCB-Congener Results
+PCB <- data %>% mutate_if(is.factor, as.character) %>% 
+  filter(txtAnalysisMethod == "1668A", 
+         grepl("PCB-*", txtConstituent))
+
+# we process each sample individually by breaking the data.frame into a series of data.frames by each SampleID
+l <- split(PCB, f =  PCB$txtSampleID)
+l2 <- lapply(l, function(i) process(i))
+dPCB <- do.call(rbind, l2)
+
+# [x.sum] aggregate according to RI summary rules
+x.sum <- dPCB %>%
+  group_by(txtSampleID) %>%
+  # add a column which is dblResult or half dblLimit, if ND
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult)) %>%
+  # sum over all the congeners
+  summarise(sumResult_0ND    = sum(dblResult, na.rm=TRUE), 
+               sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+               maxLimit = max(dblLimit)) %>%
+  # If all results are non-detect use highest single dection limit
+  mutate(`Total_zeroND`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+         `Total_halfND` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND))
+
+# [x.QA] outputs all unique flag combinations for a given sample (e.g. J q, J, J B, J C q)
+x.QA <- dPCB %>%
+  group_by(txtSampleID) %>%
+  #filter(txtQual != "U") %>%
+  #filter(!is.na(txtQual)) %>%
+  summarise( txtQualT = toString( unique(txtQual), sep = "")) 
+
+# [x.flags] collects all unique flags for a given sample (e.g BJq)
+x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>%
+  #stringr::str_replace_all( pattern ="C", replacement = "") %>% 
+  stringr::str_replace_all( pattern =" +", replacement = "-") %>% 
+  stringr::str_split(pattern = "-") %>%
+  lapply(function(x) unique(x)) %>%
+  lapply(function(x) sort(x)) %>%
+  lapply(function(x) toString(x)) %>% 
+  stringr::str_replace_all( pattern =",", replacement = "") %>%
+  stringr::str_replace_all( pattern =" ", replacement = "") %>%
+  stringr::str_replace_all( pattern ="U", replacement = "") %>%
+  stringr::str_replace_all( pattern ="C", replacement = "") %>%
+  paste0("T") %>%
+  stringr::str_replace_all( pattern ="NA", replacement = "")
+
+# check to make sure flags and summary data have teh same row dimensions
+if (length(x.flags) != dim(x.sum)[1]){
+  stop("Data mismatch between summary data and data flags list")
+}else{
+  x.sum$txtQual <- x.flags
+  #print("Data summary and flags dimensions match. Flags appended.")
+}
+
+
+
+```
+
+```{r Table4, echo=FALSE, message = FALSE}
+Table4 <- x.sum %>% select(txtSampleID, maxLimit, Total_zeroND, Total_halfND, txtQual) %>% 
+  arrange(desc(Total_zeroND))
+kable(Table4, 
+      caption = "Table 4. Total PCBs, Sum of Individual Congeners", 
+      digits = 2,
+      col.names = c("ID", "Max Limit", "Total PCBs (ND = 0)", "Total PCBs (ND = 0.5RL)", "Flags")) 
+```
+
+<div custom-style="body_text3">
+Table 4 shows Total PCBs based on summing individual congeners according to the RI and BERA summation rules. PGG also converted the Test America Laboratory format which includes all 209 PCB congeners, with duplicate results for co-eluting congeners, into standard reporting format without duplicate concentrations. For instance PCB-100 has a flag C93 which indicates that it co-elutes with the congener PCB-93. PGG reformatted the data so that both congeners are reported as a single value PCB-93+100. This crucial step avoids double counting co-eluting congener mass during the summation process.
+
+<br><br/> 
+</div>
+
+
+
+### Total DDD, DDE, and DDT Compounds
+<div custom-style="body_text1">
+Total DDD was calculated with 2,4′-DDD and 4,4′-DDD; total DDE was calculated with 2,4′-DDE and 4,4′-DDE; and total DDT was calculated with 2,4′-DDT and 4,4′-DD
+<br><br/> 
+</div>
+
+
+```{r DDD_DDT_DDE)_sum, echo = F, warning = F, message = F}
+# Load data cleanly db   <- "L:/DTNA/PGG_SedDB_2018.mdb"
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, "SELECT * FROM ExR_2bSUM"); close(con2)
+
+x <- data %>% mutate_if(is.factor, as.character) %>% 
+  filter(txtConstituent %in% c("2,4'-DDD", "4,4'-DDD", "2,4'-DDE","4,4'-DDE", "2,4'-DDT",  "4,4'-DDT")) %>%
+  mutate(DDx = ifelse(txtConstituent %in% c("2,4'-DDD", "4,4'-DDD"), "DDD", 
+                      ifelse(txtConstituent %in% c("2,4'-DDE", "4,4'-DDE"), "DDE", 
+                             ifelse(txtConstituent %in% c("2,4'-DDT", "4,4'-DDT"), "DDT", NA)
+                      )
+         )
+)
+
+x.sum <- x %>% group_by(txtSampleID, DDx) %>% 
+  mutate(dblResultzeroND = ifelse(grepl(txtQual, pattern = "U"), 0*dblLimit, dblResult)) %>%
+  mutate(dblResulthalfND = ifelse(grepl(txtQual, pattern = "U"), 0.5*dblLimit, dblResult)) %>%
+  mutate(dblResultfullND = ifelse(grepl(txtQual, pattern = "U"), 1*dblLimit, dblResult)) %>%
+  # sum over all the congeners
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+            sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+            sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+            maxLimit = max(dblLimit), 
+            n = n(),
+            nd = sum(grepl(txtQual, pattern = "U"))) %>%
+  mutate(`Total_zeroND`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+         `Total_halfND` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+         `Total_fullND` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+
+
+
+x.QA <- x %>%
+  group_by(txtSampleID, DDx) %>%
+  summarise( txtQualT = toString( unique(txtQual), sep = "")) 
+
+# [x.flags] collects all unique flags for a given sample (e.g BJq)
+x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>%
+  #stringr::str_replace_all( pattern ="C", replacement = "") %>% 
+  stringr::str_replace_all( pattern =" +", replacement = "-") %>% 
+  stringr::str_split(pattern = "-") %>%
+  lapply(function(x) unique(x)) %>%
+  lapply(function(x) sort(x)) %>%
+  lapply(function(x) toString(x)) %>% 
+  stringr::str_replace_all( pattern =",", replacement = "") %>%
+  stringr::str_replace_all( pattern =" ", replacement = "") %>%
+  stringr::str_replace_all( pattern ="U", replacement = "") %>%
+  stringr::str_replace_all( pattern ="C", replacement = "") %>%
+  paste0("T") %>%
+  stringr::str_replace_all( pattern ="NA", replacement = "")
+
+# check to make sure flags and summary data have teh same row dimensions
+if (length(x.flags) != dim(x.sum)[1]){
+  stop("Data mismatch between summary data and data flags list")
+}else{
+  x.sum$txtQual <- x.flags
+  #print("Data summary and flags dimensions match. Flags appended.")
+}
+```
+
+```{r Table5, warnings = F, echo = F, message = F}
+x.sum.DDD_DDT_DDE <- x.sum
+Table5 <- x.sum.DDD_DDT_DDE%>% select(txtSampleID, DDx, n, nd, maxLimit, Total_zeroND, Total_halfND, txtQual)
+kable(head(Table5,6), 
+      caption = "Table 5. Total DDD, DDE, DDT, Sum of Isomers", 
+      digits = 2,
+      col.names = c("ID", "DDx", "n","non-detects", "Max Limit", "Total PCBs (ND = 0)", "Total PCBs (ND = 0.5RL)", "Flags")) 
+```
+
+
+### Total DDx 
+<div custom-style="body_text1">
+Total DDx—Total DDx was calculated from the six DDx compounds: 2,4′-dichloro-diphenyl-dichloroethane (DDD); 4,4′-DDD; 2,4′-dichloro-diphenyl-dichloroethene (DDE); 4,4′-DDE; 2,4′-dichloro-diphenyl-trichloroethane (DDT); and 4,4′-DDT. 
+<br><br/> 
+</div>
+
+
+```{r totalDDx_sum, warnings = F, echo = F, message = F}
+# Load data cleanly Load
+db   <- "L:/DTNA/PGG_SedDB_2018.mdb"
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, "SELECT * FROM ExR_2bSUM"); close(con2)
+
+x <- data %>% mutate_if(is.factor, as.character) %>% 
+  filter(txtConstituent %in% c("2,4'-DDD", "4,4'-DDD", "2,4'-DDE","4,4'-DDE", "2,4'-DDT",  "4,4'-DDT")) %>% 
+  mutate(DDx = "DDx")
+
+
+x.sum <- x %>% group_by(txtSampleID, DDx) %>% 
+  mutate(dblResultzeroND = ifelse(grepl(txtQual, pattern = "U"), 0*dblLimit, dblResult)) %>%
+  mutate(dblResulthalfND = ifelse(grepl(txtQual, pattern = "U"), 0.5*dblLimit, dblResult)) %>%
+  mutate(dblResultfullND = ifelse(grepl(txtQual, pattern = "U"), 1*dblLimit, dblResult)) %>%
+  # sum over all the congeners
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+            sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+            sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+            maxLimit = max(dblLimit), 
+            n = n(),
+            nd = sum(grepl(txtQual, pattern = "U"))) %>%
+  mutate(`Total_zeroND`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+         `Total_halfND` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+         `Total_fullND` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+
+
+x.QA <- x %>%
+  group_by(txtSampleID, DDx) %>%
+  summarise( txtQualT = toString( unique(txtQual), sep = "")) 
+
+# [x.flags] collects all unique flags for a given sample (e.g BJq)
+x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>%
+  #stringr::str_replace_all( pattern ="C", replacement = "") %>% 
+  stringr::str_replace_all( pattern =" +", replacement = "-") %>% 
+  stringr::str_split(pattern = "-") %>%
+  lapply(function(x) unique(x)) %>%
+  lapply(function(x) sort(x)) %>%
+  lapply(function(x) toString(x)) %>% 
+  stringr::str_replace_all( pattern =",", replacement = "") %>%
+  stringr::str_replace_all( pattern =" ", replacement = "") %>%
+  stringr::str_replace_all( pattern ="U", replacement = "") %>%
+  stringr::str_replace_all( pattern ="C", replacement = "") %>%
+  paste0("T") %>%
+  stringr::str_replace_all( pattern ="NA", replacement = "")
+
+# check to make sure flags and summary data have teh same row dimensions
+if (length(x.flags) != dim(x.sum)[1]){
+  stop("Data mismatch between summary data and data flags list")
+}else{
+  x.sum$txtQual <- x.flags
+  print("Data summary and flags dimensions match. Flags appended.")
+}
+
+x.sum.DDx <- x.sum
+```
+
+```{r Table6, echo = F, message = F, warnings = F}
+Table6 <- x.sum.DDx %>% select(txtSampleID, DDx, n, nd, maxLimit, Total_zeroND, Total_halfND, txtQual)
+kable(head(Table6,6), 
+      caption = "Table 5. Total DDx, Sum of Isomers", 
+      digits = 2,
+      col.names = c("ID", "DDx", "n","non-detects", "Max Limit", "Total PCBs (ND = 0)", "Total PCBs (ND = 0.5RL)", "Flags")) 
+
+```
+
+
