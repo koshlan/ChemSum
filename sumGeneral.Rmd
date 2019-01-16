@@ -329,12 +329,58 @@ write.table(R,
 ```
 
 
-```{r, echo = T, warning = F, message = F, include = F}
-# test that, all unique_flags( c("a", NA,"b","a")) == 'abT'
-# test that, all_unique_flags(c(NA, NA,NA,NA)) = 'abT'
-# test that,all_unique_flags(c("b", NA,"b","a")) = 'abT'
-# test that all_unique_flags(c("1", NA,"b","a")) = '1abT'
-# test that all_unique_flags(c("ca", NA,"db","ac")) = '1abT'
-#all_unique_flags(c("ca", NA,"db","ac"))
-# all_unique_flags( c("a", NA,"b","a")) 
+## TOTAL PAH
+```{r, echo = T, warning = F, message = T}
+# Total PAHs—Total polycyclic aromatic hydrocarbons (PAHs) are the sum of the individual LPAHs and HPAHs.
+
+# FROM PAGE A3-12 of Portland Harbor RI SCRA DATABASE AND DATA MANAGEMENT
+
+#Total LPAHs—Sum of acenaphthene, anthracene, biphenyl, 2,6-dimethylnaphthalene, fluorene, 1-methylnaphthene, 2-methylnapthene, 1-methylphenanthrene, phenanthrene, naphthalene, where two or more are measured.
+
+#Total HPAHs—Sum of benzo(a)anthracene, benzo(a)pyrene, benzo(e)pyrene, chrysene, dibenzo(a,h)anthracene, fluoranthene, perylene, and pyrene, where two or more are measured.
+
+pahs <- c("2-Methylnaphthalene", #LPAH1
+          "Acenaphthene",        #LPAH2
+          "Acenaphthylene",      #LPAH3
+          "Anthracene",          #LPAH4
+          "Fluorene",            #LPAH5
+          "Naphthalene",         #LPAH6
+          "Phenanthrene",        #LPAH7
+          "Fluoranthene",        #HPAH1
+          "Pyrene",              #HPAH2
+          "Benzo(a)anthracene",  #HPAH3
+          "Chrysene",            #HPAH4
+          "Benzofluoranthene",   #HPAH5
+          "Benzo(a)pyrene" ,     #HPAH6
+          "Indeno(1,2,3-cd)pyrene", #HPAH7
+          "Dibenzo(a,h)anthracene", #HPAH8
+          "Benzo(g,h,i)perylene")   #HPAH9
+
+db   <- "L:/DTNA/PGG_SedDB_2018_SQL.mdb"
+query_string = "SELECT * FROM ExR_2bSUM_All"
+output_suffix = "SUMTOTALPAH_2018_10_15.txt"
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, query_string) 
+data <- data %>% mutate_if(is.factor, as.character)
+close(con2)
+# filter to LPAH and HPAHs
+X <- data %>% 
+  filter(txtConstituent %in% pahs,
+         !grepl(txtQual, pattern = "T"))
+# ADD CLASS
+X <- data %>% mutate(CLASS = "TOTAL_PAH")
+# RUN SUM
+S = general_analytical_summary(X)
+# PRODUCE OUTPUT
+R <- output_EDD_from_sums_and_ref(x.sum = S, x.ref = X, my_signif = 2)
+db_name <- stringr::str_replace(db, "L:/", "") %>%
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+message( sprintf("Writing to file: %s",paste0(db_name, output_suffix)))
+write.table(R, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+
 ```
