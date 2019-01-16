@@ -368,7 +368,7 @@ X <- data %>%
   filter(txtConstituent %in% pahs,
          !grepl(txtQual, pattern = "T"))
 # ADD CLASS
-X <- data %>% mutate(CLASS = "TOTAL_PAH")
+X <- X %>% mutate(CLASS = "TOTAL_PAH")
 # RUN SUM
 S = general_analytical_summary(X)
 # PRODUCE OUTPUT
