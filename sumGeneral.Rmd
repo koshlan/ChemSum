@@ -100,6 +100,60 @@ general_analytical_summary <- function(df){
 }
 
 
+#' general_analytical_summary_PDI
+#'
+#' General purpose summary function for analytical results.
+#' 
+#' @param df input data.frame object must contain columns:
+#' CLASS, txtConstituent, txtSampleID, dblResult, dblLimit, txtQual
+#'
+#' @return df.sums output data.frame
+# this is a version of the general analytical summary meant to comply strictly with 
+    # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
+    # "Calculated totals are the sum of all detected results and one half of the highest reporting
+    # detection limit for the results reported as not detected (ND) in a sample."
+general_analytical_summary_PDI <- function(df){
+  df.maxLimits <- df %>% select(CLASS,
+                              txtConstituent,
+                              txtSampleID,
+                              dblLimit,
+                              dblResult) %>%
+    mutate(DL = is.na(dblResult)) %>%                      # This labels ND samples as DL = TRUE
+    group_by(CLASS, txtSampleID, DL) %>%                   # This groups all the ND samples together per CLASS,txtSampleID
+    summarise(dblmaxLimitSample = max(dblLimit, na.rm= T), # maxLimit calculates highest limits among NDs, 
+              totalNDs = n()) %>%     
+    filter(DL == TRUE) %>% ungroup()  # this filters so that we only have maxLimit from the samples with atleaast one ND
+  
+  df.sums <- df %>% select(CLASS,
+                           txtConstituent,
+                           txtSampleID, 
+                           dblResult, 
+                           dblLimit, 
+                           txtQual) %>% 
+    left_join(df.maxLimits) %>%
+    # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
+    # "Calculated totals are the sum of all detected results and one half of the highest reporting
+    # detection limit for the results reported as not detected (ND) in a sample."
+    mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblmaxLimitSample,   dblResult)) %>%
+    mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblmaxLimitSample, dblResult)) %>%
+    mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblmaxLimitSample,   dblResult)) %>% 
+    group_by(CLASS, txtSampleID) %>%
+    summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+              sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+              sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+              maxLimit         = max(dblLimit), 
+              n                = n(),
+              nd               = sum(is.na(dblResult)),
+              txtQual       = return_all_unique_flags(txtQual) ) %>%
+    mutate(`ND_zero` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+           `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+           `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+  return(df.sums)
+  
+}
+
+
+
 #' output_EDD_from_sums_and_ref
 #'
 #' @param x.sum a data.frame with column names
@@ -175,7 +229,6 @@ output_EDD_from_sums_and_ref<- function(x.sum, x.ref, my_signif = 2){
   return(x3)
 }
 ```
-# PCB Aroclors
 
 #### Setup a Tidy Environment
 ```{r, echo = T, warning = F, message = F}
@@ -184,6 +237,73 @@ require(knitr)
 require(tidyr)
 require(RODBC)
 ```
+
+# PCB Aroclors according to PDI Summation Rules
+
+#### Load Data
+```{r, echo = T, warning = F, message = F}
+db   <- "L:/DTNA/PGG_SedDB_2018_SQL.mdb"
+query_string = "SELECT * FROM ExR_2bSUM_All"
+output_suffix = "CALC_PDI_AROCLOR_2018_10_16.txt"  
+con2 <- odbcConnectAccess(db)  ###Make sure dbase is closed####
+data <- sqlQuery(con2, query_string) 
+data <- data %>% mutate_if(is.factor, as.character)
+close(con2)
+```
+
+#### Subset the data and avoid any result with "T" flag
+```{r, echo = T, warning = F, message = F}
+A <- data %>% filter(txtAnalysisMethod == "SW8082A", !grepl(txtQual, pattern = "T")) 
+#### Subset the data
+```
+
+#### Assign a CLASS or CLASSes to summarize over
+```{r, echo = T, warning = F, message = F}
+# Assign a class, for Aroclors you might choose "Total Aroclors" or "TotalSW8082A"
+# If you want to do more complex summations, you can do by assigning as many CLASSes as
+# you like.
+A$CLASS <-"CALC_PDI_Aroclors"
+```
+
+### Run the general analytical summary function (PDI VERSION)
+```{r, echo = T, warning = F, message = F}
+S = general_analytical_summary_PDI(A)
+R <- output_EDD_from_sums_and_ref(x.sum = S, x.ref = A) 
+```
+
+### Preview Output
+```{r, echo = T, warning = F, message = F}
+head(R)
+```
+
+### Write output to txt file
+```{r, echo = T, warning = F, message = T}
+db_name <- stringr::str_replace(db, "L:/", "") %>%
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+message( sprintf("Writing to file: %s",paste0(db_name, output_suffix)))
+write.table(R, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# PCB Aroclors
 
 
 This workflow is approrpiate for analtical summaries that don't require a toxicity adjustment factor.
@@ -384,3 +504,5 @@ write.table(R,
             sep= "|")
 
 ```
+
+
