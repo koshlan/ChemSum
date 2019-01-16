@@ -292,19 +292,35 @@ x.QA <- d.PAH %>%
   group_by(TYPE, txtSampleID) %>%
   summarise( txtQualT = toString( unique(txtQual), sep = "")) 
 # [x.flags] collects all unique flags for a given sample (e.g BJq)
-x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>%
-  #stringr::str_replace_all( pattern ="C", replacement = "") %>% 
+x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "") %>% # removes the comma separating flags
+  # replace blank spaces with dashes
   stringr::str_replace_all( pattern =" +", replacement = "-") %>% 
+  # split individual flags into list
   stringr::str_split(pattern = "-") %>%
+  # only retain unique flags
   lapply(function(x) unique(x)) %>%
+  # sort flags
   lapply(function(x) sort(x)) %>%
+  # combine all flags into one long string
   lapply(function(x) toString(x)) %>% 
+  # remove comas
   stringr::str_replace_all( pattern =",", replacement = "") %>%
+  # remove spaces
   stringr::str_replace_all( pattern =" ", replacement = "") %>%
+  # removed U flag
   stringr::str_replace_all( pattern ="U", replacement = "") %>%
+  # remove C flag
   stringr::str_replace_all( pattern ="C", replacement = "") %>%
+  # add one Total T flag
   paste0("T") %>%
-  stringr::str_replace_all( pattern ="NA", replacement = "")
+  # remove any NA strings 
+  stringr::str_replace_all( pattern ="NA", replacement = "") %>%
+  # split the string into individual characters
+  strsplit("") %>% 
+  # keep only unique letters
+  lapply(function(x) unique(x)) %>%
+  lapply(function(x) paste(x, collapse = '')) %>%
+  unlist()
 
 if (length(x.flags) == dim(CPAH.sums)[1]){
   CPAH.sums$txtQual <- x.flags
