@@ -163,7 +163,7 @@ close(con2)
 ```{r subset_to_pcbs}
 # [PCB] Select only PCB-Congener Results
 PCB <- data %>% mutate_if(is.factor, as.character) %>% 
-  filter(txtAnalysisMethod == "E1668A", grepl("PCB-*", txtConstituent))
+  filter(txtAnalysisMethod == "E1668A", grepl("PCB-*", txtConstituent), !grepl("T", txtQual))
 # process each sample individually by breaking the data.frame into a series of data.frames by each SampleID
 l <- split(PCB, f =  PCB$txtSampleID)
 l2 <- lapply(l, function(i) process(i))
