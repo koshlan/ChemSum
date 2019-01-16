@@ -170,6 +170,49 @@ l2 <- lapply(l, function(i) process(i))
 dPCB <- do.call(rbind, l2)
 ```
 
+### Generate MaxLimit
+```{r}
+# this is a version of the general analytical summary meant to comply strictly with 
+    # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
+    # "Calculated totals are the sum of all detected results and one half of the highest reporting
+    # detection limit for the results reported as not detected (ND) in a sample."
+df.maxLimits <- dPCB %>% select(txtConstituent,
+                              txtSampleID,
+                              dblLimit,
+                              dblResult) %>%
+    mutate(DL = is.na(dblResult)) %>%                      # This labels ND samples as DL = TRUE
+    group_by(txtSampleID, DL) %>%                   # This groups all the ND samples together per CLASS,txtSampleID
+    summarise(dblmaxLimitSample = max(dblLimit, na.rm= T), # maxLimit calculates highest limits among NDs, 
+              totalNDs = n()) %>%     
+    filter(DL == TRUE) %>% ungroup()  # this filters so that we only have maxLimit from the samples with atleaast one ND
+```
+
+
+### Generate the x.sum object, MaxLimit PDI Versium
+```{r xsums_PDI}
+# [x.sum] aggregate according to PDQ summary rules
+x.sumPDI <- dPCB %>%
+  group_by(txtSampleID) %>%
+  left_join(df.maxLimits) %>%
+  # add a column which is dblResult or half dblLimit, if ND
+  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblmaxLimitSample   , dblResult)) %>%
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblmaxLimitSample , dblResult)) %>%
+  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblmaxLimitSample   , dblResult)) %>% 
+  # sum over all the congeners
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+            sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+            sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+            maxLimit = max(dblLimit, na.rm = T), 
+            n = n(), 
+            nd = sum(dblResult <= dblLimit)) %>%
+  # If all results are non-detect use highest single dection limit
+  mutate(`ND_zero`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+          `ND_half` = ifelse(sumResult_halfND == 0, maxLimit, sumResult_halfND),
+          `ND_full` = ifelse(sumResult_fullND == 0, maxLimit, sumResult_fullND))
+```
+
+
+
 ### Generate the x.sum object
 ```{r xsums}
 # [x.sum] aggregate according to RI summary rules
@@ -191,6 +234,8 @@ x.sum <- dPCB %>%
           `ND_half` = ifelse(sumResult_halfND == 0, maxLimit, sumResult_halfND),
           `ND_full` = ifelse(sumResult_fullND == 0, maxLimit, sumResult_fullND))
 ```
+
+
 ### Generate x.flags objects
 ```{r xflags}
 # [x.QA] outputs all unique flag combinations for a given sample (e.g. J q, J, J B, J C q)
@@ -242,6 +287,7 @@ if (length(x.flags) != dim(x.sum)[1]){
 }
 ```
 
+
 ### Generate Output
 ```{r format_output}
 x.sum$CLASS = "Total_PCB"
@@ -265,3 +311,43 @@ write.table(results,
             row.names = F, 
             sep= "|")
 ```
+
+# RUN PDI VERSION
+
+### Combine Sums and Summary Flags
+```{r combine_sums_and_flags_PDI}
+# check to make sure flags and summary data have teh same row dimensions
+if (length(x.flags) != dim(x.sumPDI)[1]){
+  stop("Data mismatch between summary data and data flags list")
+}else{
+  x.sumPDI$txtQual <- x.flags
+  #print("Data summary and flags dimensions match. Flags appended.")
+}
+```
+
+### Generate Output
+```{r format_output_PDI}
+x.sumPDI$CLASS = "CALC_PDI_Total_PCB"
+results <- output_EDD_from_sums_and_ref(x.sum=x.sumPDI, x.ref=dPCB )
+results$RESULT <- signif(results$RESULT, 2)
+db_name <- stringr::str_replace(db, "L:/", "") %>%
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+```
+
+### Preview Output
+```{r preview_output_PDI}
+head(results)
+```
+
+### Write output to txt file
+```{r write output to file PDI}
+output_suffix = "CALC_PDI_TOTAL_PCBS_2018_10_16.txt"
+write.table(results, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+```
+
+
