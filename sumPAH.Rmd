@@ -202,6 +202,51 @@ d.PAH <- filter(data, txtConstituent %in% PAH_LOOKUP$PAH)
 ### Total LPAH, HPAH
 Note that these tidyverse operations work on both analyte results and lab qualifiers. 
 
+### Generate MaxLimit
+```{r maxlimit cal}
+# this is a version of the general analytical summary meant to comply strictly with 
+    # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
+    # "Calculated totals are the sum of all detected results and one half of the highest reporting
+    # detection limit for the results reported as not detected (ND) in a sample."
+df.maxLimits <- d.PAH %>%
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH")) %>% 
+  select(CLASS, 
+         txtConstituent,
+         txtSampleID,
+         dblLimit,
+         dblResult) %>%
+    mutate(DL = is.na(dblResult)) %>%                      # This labels ND samples as DL = TRUE
+    group_by(CLASS, txtSampleID, DL) %>%                   # This groups all the ND samples together per CLASS,txtSampleID
+    summarise(dblmaxLimitSample = max(dblLimit, na.rm= T), # maxLimit calculates highest limits among NDs, 
+              totalNDs = n()) %>%     
+    filter(DL == TRUE) %>% ungroup()  # this filters so that we only have maxLimit from the samples with atleaast one ND
+```
+
+
+```{r lpah_and_hpah_sums_PDI, message = F, warnings = F, echo =T}
+# CALCULATE LPAH, HPAH SUMS
+LPAH.HPAH.sums.PDI <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH")) %>%
+  left_join(df.maxLimits) %>%
+  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblmaxLimitSample , dblResult)) %>%
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblmaxLimitSample , dblResult)) %>%
+  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblmaxLimitSample , dblResult)) %>% 
+  filter(CLASS %in% c("LPAH","HPAH")) %>%
+  group_by(CLASS, txtSampleID) %>%
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+                         sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+                         sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+                         maxLimit = max(dblLimit), 
+                         n = n(),
+                         nd = sum(is.na(dblResult))) %>%
+  mutate(`ND_zero`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+            `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+            `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+```
+
+
+
+
 ```{r lpah_and_hpah_sums, message = F, warnings = F, echo =T}
 # CALCULATE LPAH, HPAH SUMS
 LPAH.HPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
@@ -220,7 +265,8 @@ LPAH.HPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimi
   mutate(`ND_zero`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
             `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
             `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
-
+```
+```{r }
 x.QA <- d.PAH %>%
   left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH")) %>%
   filter(CLASS %in% c("LPAH","HPAH")) %>% 
@@ -257,21 +303,35 @@ x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "
   lapply(function(x) paste(x, collapse = '')) %>%
   unlist()
 
+# REGULAR
 if (length(x.flags) == dim(LPAH.HPAH.sums)[1]){
   LPAH.HPAH.sums$txtQual <- x.flags
 }else{
     stop("Error due to mismatch in number of sums and total flags")
 }
+
+# PDI VERSION
+if (length(x.flags) == dim(LPAH.HPAH.sums.PDI)[1]){
+  LPAH.HPAH.sums.PDI$txtQual <- x.flags
+}else{
+    stop("Error due to mismatch in number of sums and total flags")
+}
+```
 ```
 
 ### Total cPAHs
 Total cPAHs as benzo(a)pyrene (BaP) equivalent (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)
 ```{r cpah_sums, message = F, warnings = F, echo =T}
-CPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
+# PDI VERSION
+    # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
+    # "Calculated totals are the sum of all detected results and one half of the highest reporting
+    # detection limit for the results reported as not detected (ND) in a sample."
+CPAH.sums.PDI <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
   left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH"))%>%
-  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblLimit, dblResult*PEF)) %>%
-  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult*PEF)) %>%
-  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblLimit, dblResult*PEF)) %>% 
+  left_join(df.maxLimits) %>%
+  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblmaxLimitSample*PEF, dblResult*PEF)) %>%
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblmaxLimitSample*PEF, dblResult*PEF)) %>%
+  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblmaxLimitSample*PEF, dblResult*PEF)) %>% 
   filter(TYPE %in% c("CPAH")) %>%
   group_by(TYPE, txtSampleID) %>%
   summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
@@ -281,6 +341,27 @@ CPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, tx
             n = n(),
             nd = sum(is.na(dblResult))) %>%
   mutate(`ND_zero`    = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
+         `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
+         `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND)) %>%
+  mutate(CLASS = TYPE) %>% ungroup()
+
+
+
+# REGULAR VERSION
+CPAH.sums <- d.PAH %>% select(txtConstituent,txtSampleID,dblResult, dblLimit, txtQual) %>% 
+  left_join(PAH_LOOKUP, by = c("txtConstituent" = "PAH"))%>%
+  mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblLimit*PEF, dblResult*PEF)) %>%
+  mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit*PEF, dblResult*PEF)) %>%
+  mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblLimit*PEF, dblResult*PEF)) %>% 
+  filter(TYPE %in% c("CPAH")) %>%
+  group_by(TYPE, txtSampleID) %>%
+  summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
+            sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
+            sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
+            maxLimit = max(dblLimit), 
+            n = n(),
+            nd = sum(is.na(dblResult))) %>%
+  mutate(`ND_zero` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
          `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
          `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND)) %>%
   mutate(CLASS = TYPE) %>% ungroup()
@@ -322,14 +403,24 @@ x.flags <- stringr::str_replace_all(x.QA$txtQualT, pattern =",", replacement = "
   lapply(function(x) paste(x, collapse = '')) %>%
   unlist()
 
+# PDI VERSION
+if (length(x.flags) == dim(CPAH.sums.PDI)[1]){
+  CPAH.sums.PDI$txtQual <- x.flags
+}else{
+  stop("Error due to mismatch in number of sums and total flags")
+}
+
+# REGULAR VERSION
 if (length(x.flags) == dim(CPAH.sums)[1]){
   CPAH.sums$txtQual <- x.flags
 }else{
   stop("Error due to mismatch in number of sums and total flags")
 }
+
+
+
 ```
-
-
+s
 
 ### Execute the outputs function to write external EDD file #
 ```{r output_edd, message = F, warnings = F, echo = T}
@@ -337,7 +428,7 @@ x4 <- output_EDD_from_sums_and_ref(x.sum = LPAH.HPAH.sums,
                                x.ref = d.PAH)
 x5 <- output_EDD_from_sums_and_ref(x.sum = CPAH.sums,
                                    x.ref = d.PAH)
-x5$COMMENTS <- "CPAH (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)"
+x5$COMMENTS <- "PDI_SUMMATION RULES (ND assigned 1/2 highest DL in the full group) + CPAH (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)"
 
 x6 <- rbind(x4,x5)
 x6$RESULT <- signif(x6$RESULT,2 )
@@ -356,5 +447,35 @@ write.table(x6,
 ```{r preview, message = F, warnings = F, echo = T}
 head(x6)
 ```
+
+# PDI Version
+
+### Execute the outputs function to write external EDD file #
+```{r output_edd_PDI, message = F, warnings = F, echo = T}
+x4 <- output_EDD_from_sums_and_ref(x.sum = LPAH.HPAH.sums.PDI,
+                               x.ref = d.PAH)
+x5 <- output_EDD_from_sums_and_ref(x.sum = CPAH.sums.PDI,
+                                   x.ref = d.PAH)
+x5$COMMENTS <- "CPAH (BaPEq) concentration was calculated by multiplying the carcinogenic PAHs (cPAHs) by their respective potency equivalency factors (PEFs)"
+
+x6 <- rbind(x4,x5)
+x6$RESULT <- signif(x6$RESULT,2 )
+db_name <- stringr::str_replace(db, "L:/", "") %>% 
+  stringr::str_replace("/", "_") %>% 
+  stringr::str_replace(".mdb", "_")
+
+output_suffix = "CALC_PDI_PAHS.txt"
+write.table(x6, 
+            file = paste0(db_name, output_suffix), 
+            quote = F, 
+            row.names = F, 
+            sep= "|")
+```
+
+### Preview Output
+```{r preview_PDI, message = F, warnings = F, echo = T}
+head(x6)
+```
+
 
 
