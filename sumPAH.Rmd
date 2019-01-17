@@ -196,7 +196,7 @@ output_EDD_from_sums_and_ref<- function(x.sum, x.ref){
 con2 <- RODBC::odbcConnectAccess(db)  ###Make sure dbase is closed####
 data <- sqlQuery(con2, query_string); close(con2)
 data <- data %>% dplyr::mutate_if(is.factor, as.character)
-d.PAH <- filter(data, txtConstituent %in% PAH_LOOKUP$PAH)
+d.PAH <- filter(data, txtConstituent %in% PAH_LOOKUP$PAH, !grepl("T", txtQual))
 ```
 
 ### Total LPAH, HPAH
