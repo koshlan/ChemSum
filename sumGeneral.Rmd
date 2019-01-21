@@ -148,7 +148,8 @@ general_analytical_summary_PDI <- function(df){
               txtQual       = return_all_unique_flags(txtQual) ) %>%
     mutate(`ND_zero` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
            `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
-           `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND))
+           `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND),
+           `txtQual` = ifelse(n == nd, paste("U",txtQual, sep = ""),txtQual))
   return(df.sums)
   
 }
