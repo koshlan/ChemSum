@@ -114,6 +114,19 @@ general_analytical_summary <- function(df){
     # "Calculated totals are the sum of all detected results and one half of the highest reporting
     # detection limit for the results reported as not detected (ND) in a sample."
 general_analytical_summary_PDI <- function(df){
+  # Some datasets will include Potency Equivalent Factors. 
+  # If PEFs are included, then check that every analyte has a PEF
+  # Otherwise assign all analytes a PEF of 1
+  if (!"PEF" %in% names(df)){
+    df$PEF <- 1
+  }else{
+    if(sum(is.na(df$PEF)) > 0){
+      stop("Data is compatabile with general_analytical_summary method\n
+           PEFs are defined for some analytes and not others.")
+      } 
+  }
+  
+  
   df.maxLimits <- df %>% select(CLASS,
                               txtConstituent,
                               txtSampleID,
@@ -130,14 +143,15 @@ general_analytical_summary_PDI <- function(df){
                            txtSampleID, 
                            dblResult, 
                            dblLimit, 
-                           txtQual) %>% 
+                           txtQual,
+                           PEF) %>% 
     left_join(df.maxLimits) %>%
     # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
     # "Calculated totals are the sum of all detected results and one half of the highest reporting
     # detection limit for the results reported as not detected (ND) in a sample."
-    mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblmaxLimitSample,   dblResult)) %>%
-    mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblmaxLimitSample, dblResult)) %>%
-    mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblmaxLimitSample,   dblResult)) %>% 
+    mutate(dblResultzeroND = ifelse(is.na(dblResult), 0*dblmaxLimitSample*PEF,   dblResult*PEF)) %>%
+    mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblmaxLimitSample*PEF, dblResult*PEF)) %>%
+    mutate(dblResultfullND = ifelse(is.na(dblResult), 1*dblmaxLimitSample*PEF,   dblResult*PEF)) %>% 
     group_by(CLASS, txtSampleID) %>%
     summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
               sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
