@@ -3,7 +3,7 @@ Swan Island Lagoon|Phase I|ALS|10/09/18 11:37|ALS SOP|Total DDx_ND_zero|||511-0t
 Swan Island Lagoon|Phase I|ALS|10/11/18 11:27|ALS SOP|Total DDx_ND_zero|||512-0to28-101118|10/24/18 00:00|11/07/18 07:11|1|5.3|ug/Kg|T|0.14||
 Swan Island Lagoon|Phase I|ALS|10/13/18 13:13|ALS SOP|Total DDx_ND_zero|||513-0to26-101318|10/25/18 00:00|11/07/18 00:43|1|5|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/16/18 11:25|ALS SOP|Total DDx_ND_zero|||514-0to29-101618|10/29/18 00:00|11/07/18 19:11|1|4.9|ug/Kg|T|0.12||
-Swan Island Lagoon|Phase I|ALS|10/20/18 12:05|ALS SOP|Total DDx_ND_zero|||A1-0to30-102018|11/07/18 00:00|11/26/18 21:57|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/20/18 12:05|ALS SOP|Total DDx_ND_zero|||A1-0to30-102018|11/07/18 00:00|11/26/18 21:57|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/14/18 12:58|ALS SOP|Total DDx_ND_zero|||B1-0to20-101418|10/25/18 00:00|11/07/18 03:39|1|1|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/08/18 12:16|ALS SOP|Total DDx_ND_zero|||B3-0to21-100818|10/11/18 00:00|10/24/18 17:10|1|3.3|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/08/18 15:07|ALS SOP|Total DDx_ND_zero|||B5-0to26-100818|10/11/18 00:00|10/24/18 16:52|1|3.8|ug/Kg|T|0.14||
@@ -11,7 +11,7 @@ Swan Island Lagoon|Phase I|ALS|10/09/18 14:13|ALS SOP|Total DDx_ND_zero|||B7-0to
 Swan Island Lagoon|Phase I|ALS|10/10/18 11:53|ALS SOP|Total DDx_ND_zero|||D3-0to26-101018|10/24/18 00:00|11/07/18 05:25|1|8.1|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/09/18 11:37|ALS SOP|Total DDx_ND_zero|||D5-0to28-100918|10/11/18 00:00|10/24/18 17:45|1|6|ug/Kg|T|0.13||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:00|ALS SOP|Total DDx_ND_zero|||D6-SC-0to1-102118|10/31/18 00:00|11/17/18 01:07|1|4|ug/Kg|T|0.12||
-Swan Island Lagoon|Phase I|ALS|10/21/18 18:00|ALS SOP|Total DDx_ND_zero|||D6-SC-108to123-102118|10/31/18 00:00|11/16/18 19:50|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 18:00|ALS SOP|Total DDx_ND_zero|||D6-SC-108to123-102118|10/31/18 00:00|11/16/18 19:50|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:15|ALS SOP|Total DDx_ND_zero|||D6-SC-1to2-102118|10/31/18 00:00|11/17/18 01:42|1|5.5|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:30|ALS SOP|Total DDx_ND_zero|||D6-SC-2to4-102118|10/31/18 00:00|11/16/18 20:07|1|16|ug/Kg|T|0.1||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:50|ALS SOP|Total DDx_ND_zero|||D6-SC-40to64-102118|10/31/18 00:00|11/17/18 00:14|1|11|ug/Kg|T|0.094||
@@ -29,9 +29,9 @@ Swan Island Lagoon|Phase I|ALS|10/21/18 11:55|ALS SOP|Total DDx_ND_zero|||H3-SC-
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:40|ALS SOP|Total DDx_ND_zero|||H3-SC-29to46-102118|10/31/18 00:00|11/16/18 18:04|1|1.3|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:00|ALS SOP|Total DDx_ND_zero|||H3-SC-2to29-102118|10/31/18 00:00|11/16/18 19:14|1|14|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:50|ALS SOP|Total DDx_ND_zero|||H3-SC-46to63-102118|10/31/18 00:00|11/17/18 00:49|1|0.13|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 13:50|ALS SOP|Total DDx_ND_zero|||H3-SC-63to85-102118|10/31/18 00:00|11/16/18 19:32|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 14:15|ALS SOP|Total DDx_ND_zero|||H3-SC-85to99-102118|10/31/18 00:00|11/16/18 18:22|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 14:30|ALS SOP|Total DDx_ND_zero|||H3-SC-99to114-102118|10/31/18 00:00|11/17/18 00:32|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 13:50|ALS SOP|Total DDx_ND_zero|||H3-SC-63to85-102118|10/31/18 00:00|11/16/18 19:32|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 14:15|ALS SOP|Total DDx_ND_zero|||H3-SC-85to99-102118|10/31/18 00:00|11/16/18 18:22|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 14:30|ALS SOP|Total DDx_ND_zero|||H3-SC-99to114-102118|10/31/18 00:00|11/17/18 00:32|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/11/18 15:31|ALS SOP|Total DDx_ND_zero|||H5-0to29-101118|10/24/18 00:00|11/07/18 06:53|1|4.6|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/12/18 15:14|ALS SOP|Total DDx_ND_zero|||H7-0to24-101218|10/24/18 00:00|11/07/18 07:28|1|6.4|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/13/18 17:11|ALS SOP|Total DDx_ND_zero|||J1-0to20-101318|10/25/18 00:00|11/07/18 01:01|1|0.36|ug/Kg|T|0.094||
@@ -41,8 +41,8 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 12:50|ALS SOP|Total DDx_ND_zero|||J3-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 13:00|ALS SOP|Total DDx_ND_zero|||J3-SC-20to36-102218|11/05/18 00:00|11/21/18 16:47|1|14|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 14:25|ALS SOP|Total DDx_ND_zero|||J3-SC-36to45-102218|11/05/18 00:00|11/21/18 16:12|1|19|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 14:35|ALS SOP|Total DDx_ND_zero|||J3-SC-45to55-102218|11/05/18 00:00|11/21/18 15:54|1|1.1|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/22/18 14:45|ALS SOP|Total DDx_ND_zero|||J3-SC-55to76-102218|11/05/18 00:00|11/21/18 15:19|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/22/18 14:55|ALS SOP|Total DDx_ND_zero|||J3-SC-76to98-102218|11/05/18 00:00|11/21/18 16:29|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 14:45|ALS SOP|Total DDx_ND_zero|||J3-SC-55to76-102218|11/05/18 00:00|11/21/18 15:19|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 14:55|ALS SOP|Total DDx_ND_zero|||J3-SC-76to98-102218|11/05/18 00:00|11/21/18 16:29|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/13/18 09:36|ALS SOP|Total DDx_ND_zero|||J5-0to29-101318|10/25/18 00:00|11/07/18 00:08|1|4.7|ug/Kg|T|0.17||
 Swan Island Lagoon|Phase I|ALS|10/22/18 16:00|ALS SOP|Total DDx_ND_zero|||J5-SC-00to10-102218|11/05/18 00:00|11/26/18 14:19|1|4.1|ug/Kg|T|0.13||
 Swan Island Lagoon|Phase I|ALS|10/22/18 16:10|ALS SOP|Total DDx_ND_zero|||J5-SC-10to20-102218|11/05/18 00:00|11/21/18 18:50|1|3.4|ug/Kg|T|0.11||
@@ -53,7 +53,7 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 17:10|ALS SOP|Total DDx_ND_zero|||J5-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 17:20|ALS SOP|Total DDx_ND_zero|||J5-SC-95to110-102218|11/05/18 00:00|11/26/18 14:54|1|0.11|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:00|ALS SOP|Total DDx_ND_zero|||J6-SC-00to10-102218|11/05/18 00:00|11/21/18 15:36|1|2.9|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:10|ALS SOP|Total DDx_ND_zero|||J6-SC-10to20-102218|11/05/18 00:00|11/21/18 17:22|1|4.7|ug/Kg|T|0.11||
-Swan Island Lagoon|Phase I|ALS|10/22/18 19:50|ALS SOP|Total DDx_ND_zero|||J6-SC-111to121-102218|11/05/18 00:00|11/21/18 19:08|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 19:50|ALS SOP|Total DDx_ND_zero|||J6-SC-111to121-102218|11/05/18 00:00|11/21/18 19:08|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:20|ALS SOP|Total DDx_ND_zero|||J6-SC-20to40-102218|11/05/18 00:00|11/21/18 17:05|1|5.8|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:50|ALS SOP|Total DDx_ND_zero|||J6-SC-40to60-102218|11/05/18 00:00|11/26/18 13:44|1|12|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 19:00|ALS SOP|Total DDx_ND_zero|||J6-SC-60to80-102218|11/05/18 00:00|11/21/18 19:26|1|6.7|ug/Kg|T|0.094||
@@ -67,7 +67,7 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 10:45|ALS SOP|Total DDx_ND_zero|||L3-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 11:00|ALS SOP|Total DDx_ND_zero|||L3-SC-20to40-102218|11/05/18 00:00|11/21/18 20:01|1|1.6|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/13/18 13:13|ALS SOP|Total DDx_ND_zero|||L5-0to26-101318|10/25/18 00:00|11/07/18 01:54|1|4|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/13/18 11:36|ALS SOP|Total DDx_ND_zero|||L7-0to29-101318|10/25/18 00:00|11/07/18 01:36|1|5.2|ug/Kg|T|0.15||
-Swan Island Lagoon|Phase I|ALS|10/15/18 11:40|ALS SOP|Total DDx_ND_zero|||N1-0to30-101518|10/29/18 00:00|11/07/18 16:09|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/15/18 11:40|ALS SOP|Total DDx_ND_zero|||N1-0to30-101518|10/29/18 00:00|11/07/18 16:09|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/15/18 08:46|ALS SOP|Total DDx_ND_zero|||N3-0to26-101518|11/07/18 00:00|11/26/18 21:39|1|2.1|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/14/18 16:46|ALS SOP|Total DDx_ND_zero|||N5-0to28-101418|10/25/18 00:00|11/07/18 03:04|1|5.1|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/14/18 15:10|ALS SOP|Total DDx_ND_zero|||N7-0to27-101418|10/25/18 00:00|11/07/18 02:46|1|10|ug/Kg|T|0.14||
@@ -94,7 +94,7 @@ Swan Island Lagoon|Phase I|ALS|10/09/18 11:37|ALS SOP|Total DDx_ND_half|||511-0t
 Swan Island Lagoon|Phase I|ALS|10/11/18 11:27|ALS SOP|Total DDx_ND_half|||512-0to28-101118|10/24/18 00:00|11/07/18 07:11|1|5.4|ug/Kg|T|0.14||
 Swan Island Lagoon|Phase I|ALS|10/13/18 13:13|ALS SOP|Total DDx_ND_half|||513-0to26-101318|10/25/18 00:00|11/07/18 00:43|1|5.2|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/16/18 11:25|ALS SOP|Total DDx_ND_half|||514-0to29-101618|10/29/18 00:00|11/07/18 19:11|1|5|ug/Kg|T|0.12||
-Swan Island Lagoon|Phase I|ALS|10/20/18 12:05|ALS SOP|Total DDx_ND_half|||A1-0to30-102018|11/07/18 00:00|11/26/18 21:57|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/20/18 12:05|ALS SOP|Total DDx_ND_half|||A1-0to30-102018|11/07/18 00:00|11/26/18 21:57|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/14/18 12:58|ALS SOP|Total DDx_ND_half|||B1-0to20-101418|10/25/18 00:00|11/07/18 03:39|1|1.1|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/08/18 12:16|ALS SOP|Total DDx_ND_half|||B3-0to21-100818|10/11/18 00:00|10/24/18 17:10|1|3.4|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/08/18 15:07|ALS SOP|Total DDx_ND_half|||B5-0to26-100818|10/11/18 00:00|10/24/18 16:52|1|4|ug/Kg|T|0.14||
@@ -102,7 +102,7 @@ Swan Island Lagoon|Phase I|ALS|10/09/18 14:13|ALS SOP|Total DDx_ND_half|||B7-0to
 Swan Island Lagoon|Phase I|ALS|10/10/18 11:53|ALS SOP|Total DDx_ND_half|||D3-0to26-101018|10/24/18 00:00|11/07/18 05:25|1|8.2|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/09/18 11:37|ALS SOP|Total DDx_ND_half|||D5-0to28-100918|10/11/18 00:00|10/24/18 17:45|1|6.1|ug/Kg|T|0.13||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:00|ALS SOP|Total DDx_ND_half|||D6-SC-0to1-102118|10/31/18 00:00|11/17/18 01:07|1|4.2|ug/Kg|T|0.12||
-Swan Island Lagoon|Phase I|ALS|10/21/18 18:00|ALS SOP|Total DDx_ND_half|||D6-SC-108to123-102118|10/31/18 00:00|11/16/18 19:50|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 18:00|ALS SOP|Total DDx_ND_half|||D6-SC-108to123-102118|10/31/18 00:00|11/16/18 19:50|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:15|ALS SOP|Total DDx_ND_half|||D6-SC-1to2-102118|10/31/18 00:00|11/17/18 01:42|1|5.7|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:30|ALS SOP|Total DDx_ND_half|||D6-SC-2to4-102118|10/31/18 00:00|11/16/18 20:07|1|16|ug/Kg|T|0.1||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:50|ALS SOP|Total DDx_ND_half|||D6-SC-40to64-102118|10/31/18 00:00|11/17/18 00:14|1|11|ug/Kg|T|0.094||
@@ -120,9 +120,9 @@ Swan Island Lagoon|Phase I|ALS|10/21/18 11:55|ALS SOP|Total DDx_ND_half|||H3-SC-
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:40|ALS SOP|Total DDx_ND_half|||H3-SC-29to46-102118|10/31/18 00:00|11/16/18 18:04|1|1.4|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:00|ALS SOP|Total DDx_ND_half|||H3-SC-2to29-102118|10/31/18 00:00|11/16/18 19:14|1|14|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:50|ALS SOP|Total DDx_ND_half|||H3-SC-46to63-102118|10/31/18 00:00|11/17/18 00:49|1|0.29|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 13:50|ALS SOP|Total DDx_ND_half|||H3-SC-63to85-102118|10/31/18 00:00|11/16/18 19:32|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 14:15|ALS SOP|Total DDx_ND_half|||H3-SC-85to99-102118|10/31/18 00:00|11/16/18 18:22|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 14:30|ALS SOP|Total DDx_ND_half|||H3-SC-99to114-102118|10/31/18 00:00|11/17/18 00:32|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 13:50|ALS SOP|Total DDx_ND_half|||H3-SC-63to85-102118|10/31/18 00:00|11/16/18 19:32|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 14:15|ALS SOP|Total DDx_ND_half|||H3-SC-85to99-102118|10/31/18 00:00|11/16/18 18:22|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 14:30|ALS SOP|Total DDx_ND_half|||H3-SC-99to114-102118|10/31/18 00:00|11/17/18 00:32|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/11/18 15:31|ALS SOP|Total DDx_ND_half|||H5-0to29-101118|10/24/18 00:00|11/07/18 06:53|1|4.8|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/12/18 15:14|ALS SOP|Total DDx_ND_half|||H7-0to24-101218|10/24/18 00:00|11/07/18 07:28|1|6.6|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/13/18 17:11|ALS SOP|Total DDx_ND_half|||J1-0to20-101318|10/25/18 00:00|11/07/18 01:01|1|0.46|ug/Kg|T|0.094||
@@ -132,8 +132,8 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 12:50|ALS SOP|Total DDx_ND_half|||J3-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 13:00|ALS SOP|Total DDx_ND_half|||J3-SC-20to36-102218|11/05/18 00:00|11/21/18 16:47|1|14|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 14:25|ALS SOP|Total DDx_ND_half|||J3-SC-36to45-102218|11/05/18 00:00|11/21/18 16:12|1|20|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 14:35|ALS SOP|Total DDx_ND_half|||J3-SC-45to55-102218|11/05/18 00:00|11/21/18 15:54|1|1.3|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/22/18 14:45|ALS SOP|Total DDx_ND_half|||J3-SC-55to76-102218|11/05/18 00:00|11/21/18 15:19|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/22/18 14:55|ALS SOP|Total DDx_ND_half|||J3-SC-76to98-102218|11/05/18 00:00|11/21/18 16:29|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 14:45|ALS SOP|Total DDx_ND_half|||J3-SC-55to76-102218|11/05/18 00:00|11/21/18 15:19|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 14:55|ALS SOP|Total DDx_ND_half|||J3-SC-76to98-102218|11/05/18 00:00|11/21/18 16:29|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/13/18 09:36|ALS SOP|Total DDx_ND_half|||J5-0to29-101318|10/25/18 00:00|11/07/18 00:08|1|4.9|ug/Kg|T|0.17||
 Swan Island Lagoon|Phase I|ALS|10/22/18 16:00|ALS SOP|Total DDx_ND_half|||J5-SC-00to10-102218|11/05/18 00:00|11/26/18 14:19|1|4.3|ug/Kg|T|0.13||
 Swan Island Lagoon|Phase I|ALS|10/22/18 16:10|ALS SOP|Total DDx_ND_half|||J5-SC-10to20-102218|11/05/18 00:00|11/21/18 18:50|1|3.5|ug/Kg|T|0.11||
@@ -144,7 +144,7 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 17:10|ALS SOP|Total DDx_ND_half|||J5-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 17:20|ALS SOP|Total DDx_ND_half|||J5-SC-95to110-102218|11/05/18 00:00|11/26/18 14:54|1|0.26|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:00|ALS SOP|Total DDx_ND_half|||J6-SC-00to10-102218|11/05/18 00:00|11/21/18 15:36|1|3|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:10|ALS SOP|Total DDx_ND_half|||J6-SC-10to20-102218|11/05/18 00:00|11/21/18 17:22|1|4.9|ug/Kg|T|0.11||
-Swan Island Lagoon|Phase I|ALS|10/22/18 19:50|ALS SOP|Total DDx_ND_half|||J6-SC-111to121-102218|11/05/18 00:00|11/21/18 19:08|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 19:50|ALS SOP|Total DDx_ND_half|||J6-SC-111to121-102218|11/05/18 00:00|11/21/18 19:08|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:20|ALS SOP|Total DDx_ND_half|||J6-SC-20to40-102218|11/05/18 00:00|11/21/18 17:05|1|5.9|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:50|ALS SOP|Total DDx_ND_half|||J6-SC-40to60-102218|11/05/18 00:00|11/26/18 13:44|1|12|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 19:00|ALS SOP|Total DDx_ND_half|||J6-SC-60to80-102218|11/05/18 00:00|11/21/18 19:26|1|6.8|ug/Kg|T|0.094||
@@ -158,7 +158,7 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 10:45|ALS SOP|Total DDx_ND_half|||L3-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 11:00|ALS SOP|Total DDx_ND_half|||L3-SC-20to40-102218|11/05/18 00:00|11/21/18 20:01|1|1.6|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/13/18 13:13|ALS SOP|Total DDx_ND_half|||L5-0to26-101318|10/25/18 00:00|11/07/18 01:54|1|4.2|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/13/18 11:36|ALS SOP|Total DDx_ND_half|||L7-0to29-101318|10/25/18 00:00|11/07/18 01:36|1|5.4|ug/Kg|T|0.15||
-Swan Island Lagoon|Phase I|ALS|10/15/18 11:40|ALS SOP|Total DDx_ND_half|||N1-0to30-101518|10/29/18 00:00|11/07/18 16:09|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/15/18 11:40|ALS SOP|Total DDx_ND_half|||N1-0to30-101518|10/29/18 00:00|11/07/18 16:09|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/15/18 08:46|ALS SOP|Total DDx_ND_half|||N3-0to26-101518|11/07/18 00:00|11/26/18 21:39|1|2.1|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/14/18 16:46|ALS SOP|Total DDx_ND_half|||N5-0to28-101418|10/25/18 00:00|11/07/18 03:04|1|5.3|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/14/18 15:10|ALS SOP|Total DDx_ND_half|||N7-0to27-101418|10/25/18 00:00|11/07/18 02:46|1|11|ug/Kg|T|0.14||
@@ -185,7 +185,7 @@ Swan Island Lagoon|Phase I|ALS|10/09/18 11:37|ALS SOP|Total DDx_ND_full|||511-0t
 Swan Island Lagoon|Phase I|ALS|10/11/18 11:27|ALS SOP|Total DDx_ND_full|||512-0to28-101118|10/24/18 00:00|11/07/18 07:11|1|5.6|ug/Kg|T|0.14||
 Swan Island Lagoon|Phase I|ALS|10/13/18 13:13|ALS SOP|Total DDx_ND_full|||513-0to26-101318|10/25/18 00:00|11/07/18 00:43|1|5.4|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/16/18 11:25|ALS SOP|Total DDx_ND_full|||514-0to29-101618|10/29/18 00:00|11/07/18 19:11|1|5.1|ug/Kg|T|0.12||
-Swan Island Lagoon|Phase I|ALS|10/20/18 12:05|ALS SOP|Total DDx_ND_full|||A1-0to30-102018|11/07/18 00:00|11/26/18 21:57|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/20/18 12:05|ALS SOP|Total DDx_ND_full|||A1-0to30-102018|11/07/18 00:00|11/26/18 21:57|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/14/18 12:58|ALS SOP|Total DDx_ND_full|||B1-0to20-101418|10/25/18 00:00|11/07/18 03:39|1|1.1|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/08/18 12:16|ALS SOP|Total DDx_ND_full|||B3-0to21-100818|10/11/18 00:00|10/24/18 17:10|1|3.5|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/08/18 15:07|ALS SOP|Total DDx_ND_full|||B5-0to26-100818|10/11/18 00:00|10/24/18 16:52|1|4.1|ug/Kg|T|0.14||
@@ -193,7 +193,7 @@ Swan Island Lagoon|Phase I|ALS|10/09/18 14:13|ALS SOP|Total DDx_ND_full|||B7-0to
 Swan Island Lagoon|Phase I|ALS|10/10/18 11:53|ALS SOP|Total DDx_ND_full|||D3-0to26-101018|10/24/18 00:00|11/07/18 05:25|1|8.3|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/09/18 11:37|ALS SOP|Total DDx_ND_full|||D5-0to28-100918|10/11/18 00:00|10/24/18 17:45|1|6.3|ug/Kg|T|0.13||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:00|ALS SOP|Total DDx_ND_full|||D6-SC-0to1-102118|10/31/18 00:00|11/17/18 01:07|1|4.4|ug/Kg|T|0.12||
-Swan Island Lagoon|Phase I|ALS|10/21/18 18:00|ALS SOP|Total DDx_ND_full|||D6-SC-108to123-102118|10/31/18 00:00|11/16/18 19:50|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 18:00|ALS SOP|Total DDx_ND_full|||D6-SC-108to123-102118|10/31/18 00:00|11/16/18 19:50|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:15|ALS SOP|Total DDx_ND_full|||D6-SC-1to2-102118|10/31/18 00:00|11/17/18 01:42|1|5.9|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:30|ALS SOP|Total DDx_ND_full|||D6-SC-2to4-102118|10/31/18 00:00|11/16/18 20:07|1|16|ug/Kg|T|0.1||
 Swan Island Lagoon|Phase I|ALS|10/21/18 16:50|ALS SOP|Total DDx_ND_full|||D6-SC-40to64-102118|10/31/18 00:00|11/17/18 00:14|1|11|ug/Kg|T|0.094||
@@ -211,9 +211,9 @@ Swan Island Lagoon|Phase I|ALS|10/21/18 11:55|ALS SOP|Total DDx_ND_full|||H3-SC-
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:40|ALS SOP|Total DDx_ND_full|||H3-SC-29to46-102118|10/31/18 00:00|11/16/18 18:04|1|1.5|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:00|ALS SOP|Total DDx_ND_full|||H3-SC-2to29-102118|10/31/18 00:00|11/16/18 19:14|1|14|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/21/18 12:50|ALS SOP|Total DDx_ND_full|||H3-SC-46to63-102118|10/31/18 00:00|11/17/18 00:49|1|0.44|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 13:50|ALS SOP|Total DDx_ND_full|||H3-SC-63to85-102118|10/31/18 00:00|11/16/18 19:32|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 14:15|ALS SOP|Total DDx_ND_full|||H3-SC-85to99-102118|10/31/18 00:00|11/16/18 18:22|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/21/18 14:30|ALS SOP|Total DDx_ND_full|||H3-SC-99to114-102118|10/31/18 00:00|11/17/18 00:32|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 13:50|ALS SOP|Total DDx_ND_full|||H3-SC-63to85-102118|10/31/18 00:00|11/16/18 19:32|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 14:15|ALS SOP|Total DDx_ND_full|||H3-SC-85to99-102118|10/31/18 00:00|11/16/18 18:22|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/21/18 14:30|ALS SOP|Total DDx_ND_full|||H3-SC-99to114-102118|10/31/18 00:00|11/17/18 00:32|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/11/18 15:31|ALS SOP|Total DDx_ND_full|||H5-0to29-101118|10/24/18 00:00|11/07/18 06:53|1|4.9|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/12/18 15:14|ALS SOP|Total DDx_ND_full|||H7-0to24-101218|10/24/18 00:00|11/07/18 07:28|1|6.7|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/13/18 17:11|ALS SOP|Total DDx_ND_full|||J1-0to20-101318|10/25/18 00:00|11/07/18 01:01|1|0.56|ug/Kg|T|0.094||
@@ -223,8 +223,8 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 12:50|ALS SOP|Total DDx_ND_full|||J3-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 13:00|ALS SOP|Total DDx_ND_full|||J3-SC-20to36-102218|11/05/18 00:00|11/21/18 16:47|1|14|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 14:25|ALS SOP|Total DDx_ND_full|||J3-SC-36to45-102218|11/05/18 00:00|11/21/18 16:12|1|20|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 14:35|ALS SOP|Total DDx_ND_full|||J3-SC-45to55-102218|11/05/18 00:00|11/21/18 15:54|1|1.4|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/22/18 14:45|ALS SOP|Total DDx_ND_full|||J3-SC-55to76-102218|11/05/18 00:00|11/21/18 15:19|1|0.094|ug/Kg|T|0.094||
-Swan Island Lagoon|Phase I|ALS|10/22/18 14:55|ALS SOP|Total DDx_ND_full|||J3-SC-76to98-102218|11/05/18 00:00|11/21/18 16:29|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 14:45|ALS SOP|Total DDx_ND_full|||J3-SC-55to76-102218|11/05/18 00:00|11/21/18 15:19|1|0.094|ug/Kg|UT|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 14:55|ALS SOP|Total DDx_ND_full|||J3-SC-76to98-102218|11/05/18 00:00|11/21/18 16:29|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/13/18 09:36|ALS SOP|Total DDx_ND_full|||J5-0to29-101318|10/25/18 00:00|11/07/18 00:08|1|5|ug/Kg|T|0.17||
 Swan Island Lagoon|Phase I|ALS|10/22/18 16:00|ALS SOP|Total DDx_ND_full|||J5-SC-00to10-102218|11/05/18 00:00|11/26/18 14:19|1|4.5|ug/Kg|T|0.13||
 Swan Island Lagoon|Phase I|ALS|10/22/18 16:10|ALS SOP|Total DDx_ND_full|||J5-SC-10to20-102218|11/05/18 00:00|11/21/18 18:50|1|3.6|ug/Kg|T|0.11||
@@ -235,7 +235,7 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 17:10|ALS SOP|Total DDx_ND_full|||J5-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 17:20|ALS SOP|Total DDx_ND_full|||J5-SC-95to110-102218|11/05/18 00:00|11/26/18 14:54|1|0.42|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:00|ALS SOP|Total DDx_ND_full|||J6-SC-00to10-102218|11/05/18 00:00|11/21/18 15:36|1|3.1|ug/Kg|T|0.12||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:10|ALS SOP|Total DDx_ND_full|||J6-SC-10to20-102218|11/05/18 00:00|11/21/18 17:22|1|5|ug/Kg|T|0.11||
-Swan Island Lagoon|Phase I|ALS|10/22/18 19:50|ALS SOP|Total DDx_ND_full|||J6-SC-111to121-102218|11/05/18 00:00|11/21/18 19:08|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/22/18 19:50|ALS SOP|Total DDx_ND_full|||J6-SC-111to121-102218|11/05/18 00:00|11/21/18 19:08|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:20|ALS SOP|Total DDx_ND_full|||J6-SC-20to40-102218|11/05/18 00:00|11/21/18 17:05|1|6|ug/Kg|T|0.11||
 Swan Island Lagoon|Phase I|ALS|10/22/18 18:50|ALS SOP|Total DDx_ND_full|||J6-SC-40to60-102218|11/05/18 00:00|11/26/18 13:44|1|12|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/22/18 19:00|ALS SOP|Total DDx_ND_full|||J6-SC-60to80-102218|11/05/18 00:00|11/21/18 19:26|1|7|ug/Kg|T|0.094||
@@ -249,7 +249,7 @@ Swan Island Lagoon|Phase I|ALS|10/22/18 10:45|ALS SOP|Total DDx_ND_full|||L3-SC-
 Swan Island Lagoon|Phase I|ALS|10/22/18 11:00|ALS SOP|Total DDx_ND_full|||L3-SC-20to40-102218|11/05/18 00:00|11/21/18 20:01|1|1.6|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/13/18 13:13|ALS SOP|Total DDx_ND_full|||L5-0to26-101318|10/25/18 00:00|11/07/18 01:54|1|4.4|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/13/18 11:36|ALS SOP|Total DDx_ND_full|||L7-0to29-101318|10/25/18 00:00|11/07/18 01:36|1|5.6|ug/Kg|T|0.15||
-Swan Island Lagoon|Phase I|ALS|10/15/18 11:40|ALS SOP|Total DDx_ND_full|||N1-0to30-101518|10/29/18 00:00|11/07/18 16:09|1|0.094|ug/Kg|T|0.094||
+Swan Island Lagoon|Phase I|ALS|10/15/18 11:40|ALS SOP|Total DDx_ND_full|||N1-0to30-101518|10/29/18 00:00|11/07/18 16:09|1|0.094|ug/Kg|UT|0.094||
 Swan Island Lagoon|Phase I|ALS|10/15/18 08:46|ALS SOP|Total DDx_ND_full|||N3-0to26-101518|11/07/18 00:00|11/26/18 21:39|1|2.2|ug/Kg|T|0.094||
 Swan Island Lagoon|Phase I|ALS|10/14/18 16:46|ALS SOP|Total DDx_ND_full|||N5-0to28-101418|10/25/18 00:00|11/07/18 03:04|1|5.6|ug/Kg|T|0.15||
 Swan Island Lagoon|Phase I|ALS|10/14/18 15:10|ALS SOP|Total DDx_ND_full|||N7-0to27-101418|10/25/18 00:00|11/07/18 02:46|1|11|ug/Kg|T|0.14||
