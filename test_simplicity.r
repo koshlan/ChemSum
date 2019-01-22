@@ -17,7 +17,7 @@ query_string = "SELECT * FROM ExR_2bSUM_All"
 
 
 # Load Data
-con2 <- odbcConnectAccess(paste0(db,path))  ###Make sure dbase is closed####
+con2 <- odbcConnectAccess(paste0(path,db))  ###Make sure dbase is closed####
 data <-sqlQuery(con2, query_string)
 data <- data %>% mutate_if(is.factor, as.character)
 close(con2)
@@ -33,7 +33,7 @@ R <- data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 class_name = "PDI_CALC_TOTAL_AROCLORS"
@@ -45,13 +45,13 @@ data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 # This is the entire process for DDx results
 class_name = "PDI_CALC_TOTAL_DDX"
 output_suffix = ".PDI_CALC_TOTAL_DDX.tsv"
-output_name = paste0(db, output_suffix)
+paste0(db, output_suffix) = paste0(db, output_suffix)
 # This is the entire process to produce Aroclor Results
 data %>% 
   selectorDDx() %>% 
@@ -59,12 +59,12 @@ data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 class_name = "PDI_CALC_TOTAL_CPAH"
 output_suffix = ".PDI_CALC_TOTAL_CPAH.tsv"
-output_name = paste0(db, output_suffix)
+paste0(db, output_suffix) = paste0(db, output_suffix)
 # This is the entire proces for cPAH results
 data %>% 
   selectorCPAH() %>% 
@@ -73,11 +73,11 @@ data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 class_name = "PDI_CALC_TOTAL_LPAH"
 output_suffix = ".PDI_CALC_TOTAL_LPAH.tsv"
-output_name = paste0(db, output_suffix)
+paste0(db, output_suffix) = paste0(db, output_suffix)
 # This is the entire proces for LPAH results
 data %>% 
   selectorLPAH() %>% 
@@ -85,11 +85,11 @@ data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 class_name = "PDI_CALC_TOTAL_HPAH"
 output_suffix = ".PDI_CALC_TOTAL_HPAH.tsv"
-output_name = paste0(db, output_suffix)
+paste0(db, output_suffix) = paste0(db, output_suffix)
 # This is the entire proces for LPAH results
 data %>% 
   selectorHPAH() %>% 
@@ -97,12 +97,11 @@ data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 class_name = "PDI_CALC_TOTAL_PAH"
 output_suffix = ".PDI_CALC_TOTAL_PAH.tsv"
-output_name = paste0(db, output_suffix)
 # This is the entire proces for LPAH results
 data %>% 
   selectorPAH() %>% 
@@ -110,13 +109,13 @@ data %>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-  write.table(output_name, sep= "|", row.names = F, quote = F)
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 
 # alternative for PAHs if you want to do LPAH and HPAH in the same file
 # output_suffix = ".PDI_CALC_TOTAL_LplusHPAH.tsv"
-# output_name = paste0(db, output_suffix)
+# paste0(db, output_suffix) = paste0(db, output_suffix)
 # # This is the entire proces for LPAH results
 # data %>% 
 #   selectorPAH() %>% 
@@ -124,7 +123,7 @@ data %>%
 #   assign(x = "R", value = ., pos = 1) %>% 
 #   general_analytical_summary(PDI = T) %>%
 #   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
-#   write.table(output_name, sep= "|", row.names = F, quote = F)
+#   write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 
