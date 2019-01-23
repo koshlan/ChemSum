@@ -15,12 +15,35 @@ path = "L:/DTNA/"
 db <- "PGG_SedDB_2018_SQL.mdb"
 query_string = "SELECT * FROM ExR_2bSUM_All"
 
+# # TEST ONLY
+# data <- read.delim("CPAH_testfile.txt", header = T, as.is = T, sep = "\t")
+# tail(data)
+# str(data)
+# class_name = "PDI_CALC_TOTAL_CPAH"
+# output_suffix = ".PDI_CALC_TOTAL_CPAH.tsv"
+# # This is the entire proces for cPAH results
+# data %>% 
+#   selectorCPAH() %>% 
+#   assignPEFCPAH() %>%
+#   mutate(CLASS = class_name) %T>%  
+#   assign(x = "R", value = ., pos = 1) %>% 
+#   general_analytical_summary(PDI = T) %>%
+#   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 4) %>%
+#   write.table("testCPAH_PDI_METHOD", sep= "|", row.names = F, quote = F)
+# 
+# head(data)
+
+
 
 # Load Data
 con2 <- odbcConnectAccess(paste0(path,db))  ###Make sure dbase is closed####
 data <-sqlQuery(con2, query_string)
 data <- data %>% mutate_if(is.factor, as.character)
 close(con2)
+
+
+
+
 
 
 class_name = "PDI_CALC_TOTAL_PCB"

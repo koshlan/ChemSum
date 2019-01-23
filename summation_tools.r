@@ -22,6 +22,22 @@
 # workflow for producing  Electronic Data Deliverables (EDDs) 
 # for these summary results
 
+
+#' safe add
+#' 
+#' add NAs such that they are treated as zeros
+#' 
+#' @param a numeric or numeric vector 
+#' @param b numeric or numeric vector
+#'
+#' @return aplusb the addition of a and b where NA is treated as zero
+safe_add<-function(a,b){
+  a[is.na(a)] <- 0
+  b[is.na(b)] <- 0
+  aplusb = a+b
+  return(aplusb)
+}
+
 #' get_unique_chars
 #' 
 #' given any string return an sorted list of unique single charcters in alphabetical order
@@ -139,10 +155,11 @@ general_analytical_summary <- function(df, PDI = T){
                                 txtConstituent,
                                 txtSampleID,
                                 dblLimit,
-                                dblResult) %>%
+                                dblResult,
+                                PEF) %>%
     mutate(DL = is.na(dblResult)) %>%                      # This labels ND samples as DL = TRUE
     group_by(CLASS, txtSampleID, DL) %>%                   # This groups all the ND samples together per CLASS,txtSampleID
-    summarise(dblmaxLimitSample = max(dblLimit, na.rm= T), # maxLimit calculates highest limits among NDs, 
+    summarise(dblmaxLimitSample = max(dblLimit*PEF, na.rm= T), # maxLimit calculates highest limits among NDs, 
               totalNDs = n()) %>%     
     filter(DL == TRUE) %>% ungroup()  # this filters so that we only have maxLimit from the samples with atleaast one ND
   
@@ -157,26 +174,23 @@ general_analytical_summary <- function(df, PDI = T){
     # page 3. | Appendix E: 2018 PDI Surface Sediment Database Description
     # "Calculated totals are the sum of all detected results and one half of the highest reporting
     # detection limit for the results reported as not detected (ND) in a sample."
-    mutate(dblResultzeroND = ifelse(PDI,
-                                    ifelse(is.na(dblResult), 0*dblmaxLimitSample*PEF,   dblResult*PEF),
-                                    ifelse(is.na(dblResult), 0*dblLimit*PEF,   dblResult*PEF))) %>%
-    mutate(dblResulthalfND = ifelse(PDI,
-                                    ifelse(is.na(dblResult), 0.5*dblmaxLimitSample*PEF, dblResult*PEF),
-                                    ifelse(is.na(dblResult), 0.5*dblLimit*PEF,   dblResult*PEF))) %>%
-    mutate(dblResultfullND = ifelse(PDI, 
-                                    ifelse(is.na(dblResult), 1*dblmaxLimitSample*PEF,   dblResult*PEF),
-                                    ifelse(is.na(dblResult), 1*dblLimit*PEF,   dblResult*PEF))) %>% 
+    mutate(dblResultzeroND = ifelse(is.na(dblResult), 0  *dblLimit, dblResult*PEF))  %>%
+    mutate(dblResulthalfND = ifelse(is.na(dblResult), 0.5*dblLimit, dblResult*PEF))  %>%
+    mutate(dblResultfullND = ifelse(is.na(dblResult), 1  *dblLimit, dblResult*PEF))  %>%
     group_by(CLASS, txtSampleID) %>%
     summarise(sumResult_0ND    = sum(dblResultzeroND, na.rm=TRUE), 
               sumResult_halfND = sum(dblResulthalfND, na.rm=TRUE),
               sumResult_fullND = sum(dblResultfullND, na.rm=TRUE),
-              maxLimit         = max(dblLimit), 
+              maxLimit         = max(dblLimit),
+              maxNDLimit       = max(dblmaxLimitSample),
               n                = n(),
               nd               = sum(is.na(dblResult)),
               txtQual       = return_all_unique_flags(txtQual) ) %>%
+    mutate( sumResult_halfPDI = safe_add(sumResult_0ND, 0.5*maxNDLimit)) %>%
     mutate(`ND_zero` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_0ND), 
            `ND_half` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfND),
            `ND_full` = ifelse(sumResult_0ND == 0, maxLimit, sumResult_fullND),
+           `ND_PDI`  = ifelse(sumResult_0ND == 0, maxLimit, sumResult_halfPDI),
            `txtQual` = ifelse(n == nd, paste("U",txtQual, sep = ""),txtQual))
   return(df.sums)
   
@@ -196,7 +210,8 @@ general_analytical_summary <- function(df, PDI = T){
 #'   "nd", 
 #'   "ND_zero", 
 #'   "ND_half", 
-#'   "ND_full", 
+#'   "ND_full",
+#'   "ND_PDI", 
 #'   "txtQual", 
 #'   "CLASS"
 #' @param x.ref a data.frame with other sample information which will be joined. It must contain the following headers to avoid an error
@@ -224,7 +239,8 @@ output_EDD_from_sums_and_ref<- function(x.sum, x.ref, my_signif = 2){
   ref_info <- x.ref %>% group_by(txtSampleID, CLASS) %>% slice(1) %>% 
     select(-txtConstituent, -txtCASID, -txtQual, -dblLimit, -dblResult)
   
-  x1 <- x.sum %>% select(CLASS, txtSampleID, ND_zero, ND_half, ND_full,txtQual, maxLimit) %>%
+
+  x1 <- x.sum %>% select(CLASS, txtSampleID, ND_zero, ND_half, ND_full, ND_PDI, txtQual, maxLimit) %>%
     gather(summation, dblResult, -CLASS, -txtSampleID, -txtQual, -maxLimit) %>% 
     mutate(txtConstiuent = paste0(CLASS, "_", summation)) %>% ungroup()
   
