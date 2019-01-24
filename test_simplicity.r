@@ -1,5 +1,5 @@
 
-# Test - Show that PCB, Aroclors, CPAH, LPAH, HPAH, DDx can all be done with one regular work flow
+# Test - Show that TCDDeq, PCB congeners, Aroclors,CPAH, LPAH, HPAH, DDx can all be done with one regular work flow
 
 # January 21, 2019
 require(dplyr)
@@ -15,25 +15,6 @@ path = "L:/DTNA/"
 db <- "PGG_SedDB_2018_SQL.mdb"
 query_string = "SELECT * FROM ExR_2bSUM_All"
 
-# # TEST ONLY
-# data <- read.delim("CPAH_testfile.txt", header = T, as.is = T, sep = "\t")
-# tail(data)
-# str(data)
-# class_name = "PDI_CALC_TOTAL_CPAH"
-# output_suffix = ".PDI_CALC_TOTAL_CPAH.tsv"
-# # This is the entire proces for cPAH results
-# data %>% 
-#   selectorCPAH() %>% 
-#   assignPEFCPAH() %>%
-#   mutate(CLASS = class_name) %T>%  
-#   assign(x = "R", value = ., pos = 1) %>% 
-#   general_analytical_summary(PDI = T) %>%
-#   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 4) %>%
-#   write.table("testCPAH_PDI_METHOD", sep= "|", row.names = F, quote = F)
-# 
-# head(data)
-
-
 
 # Load Data
 con2 <- odbcConnectAccess(paste0(path,db))  ###Make sure dbase is closed####
@@ -42,14 +23,22 @@ data <- data %>% mutate_if(is.factor, as.character)
 close(con2)
 
 
-
-
+class_name = "PDI_CALC_TCDDTEQ"
+output_suffix = ".PDI_CALC_TCDDTEQ.tsv"
+data %>%  
+  selectorTCDD() %>% #!# filters to 17 Dioxin Furans
+  assignPEFTCCD() %>% #!# assigns PEF/TEF factors
+  mutate(CLASS = class_name) %T>%  
+  assign(x = "R", value = ., pos = 1) %>% 
+  general_analytical_summary(PDI = T) %>%
+  output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
+  write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
 
 
 class_name = "PDI_CALC_TOTAL_PCB"
 output_suffix = ".PDI_CALC_TOTAL_PCB_CONGENERS.tsv"
 # This is the entire process to produce PCB Congener results
-R <- data %>% 
+data %>% 
   selectorPCB() %>%    #!#
   process_pcb_df() %>% #!#
   mutate(CLASS = class_name) %T>% 
@@ -57,7 +46,6 @@ R <- data %>%
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%
   write.table(paste0(db, output_suffix), sep= "|", row.names = F, quote = F)
-
 
 class_name = "PDI_CALC_TOTAL_AROCLORS"
 output_suffix = ".PDI_CALC_TOTAL_PCB_AROCLOR.tsv"

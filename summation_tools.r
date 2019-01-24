@@ -361,6 +361,30 @@ selectorPAH <- function(x){
   return(y)
 }
 
+selectorTCDD <- function(x){
+  y = filter(x, txtConstituent %in%  c("2,3,7,8-TCDD",
+                                       "1,2,3,7,8-PeCDD",
+                                       "2,3,4,7,8-PeCDF",
+                                       "2,3,7,8-TCDF",
+                                       "1,2,3,4,7,8-HxCDD",
+                                       "1,2,3,4,7,8-HxCDF",
+                                       "1,2,3,7,8,9-HxCDF",
+                                       "1,2,3,7,8,9-HxCDD",
+                                       "1,2,3,6,7,8-HxCDD",
+                                       "1,2,3,6,7,8-HxCDF",
+                                       "2,3,4,6,7,8-HxCDF",
+                                       "1,2,3,7,8-PeCDF",
+                                       "1,2,3,4,7,8,9-HpCDF",
+                                       "1,2,3,4,6,7,8-HpCDD",
+                                       "1,2,3,4,6,7,8-HpCDF",
+                                       "OCDF",
+                                       "OCDD"),
+             !grepl("T", txtQual))
+  return(y)
+}
+
+
+
 assignClassPAH <- function(x){
   y <- x %>% mutate(CLASS = 
                       ifelse(txtConstituent %in%  c("Fluoranthene", 
@@ -411,3 +435,44 @@ assignPEFCPAH <- function(x){
   return(y)
 }
 
+assignPEFTCCD <- function(x){
+  TCDD <- data.frame( txtConstituent = c("2,3,7,8-TCDD",
+                                         "1,2,3,7,8-PeCDD",
+                                         "2,3,4,7,8-PeCDF",
+                                         "2,3,7,8-TCDF",
+                                         "1,2,3,4,7,8-HxCDD",
+                                         "1,2,3,4,7,8-HxCDF",
+                                         "1,2,3,7,8,9-HxCDF",
+                                         "1,2,3,7,8,9-HxCDD",
+                                         "1,2,3,6,7,8-HxCDD",
+                                         "1,2,3,6,7,8-HxCDF",
+                                         "2,3,4,6,7,8-HxCDF",
+                                         "1,2,3,7,8-PeCDF",
+                                         "1,2,3,4,7,8,9-HpCDF",
+                                         "1,2,3,4,6,7,8-HpCDD",
+                                         "1,2,3,4,6,7,8-HpCDF",
+                                         "OCDF",
+                                         "OCDD"),
+                      PEF = c(1,
+                              1,
+                              0.3,
+                              0.1,
+                              0.1,
+                              0.1,
+                              0.1,
+                              0.1,
+                              0.1,
+                              0.1,
+                              0.1,
+                              0.03,
+                              0.01,
+                              0.01,
+                              0.01,
+                              0.0003,
+                              0.0003), 
+                      stringsAsFactors = F)
+  y = left_join(x,TCDD)
+  return(y)
+  
+  
+}
