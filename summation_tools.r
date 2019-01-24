@@ -160,7 +160,8 @@ general_analytical_summary <- function(df, PDI = T){
     mutate(DL = is.na(dblResult)) %>%                      # This labels ND samples as DL = TRUE
     group_by(CLASS, txtSampleID, DL) %>%                   # This groups all the ND samples together per CLASS,txtSampleID
     summarise(dblmaxLimitSample = max(dblLimit*PEF, na.rm= T), # maxLimit calculates highest limits among NDs, 
-              totalNDs = n()) %>%     
+              totalNDs = n()) %>% 
+    mutate(dblmaxLimitSample = ifelse(dblmaxLimitSample == -Inf, 0, dblmaxLimitSample)) %>%
     filter(DL == TRUE) %>% ungroup()  # this filters so that we only have maxLimit from the samples with atleaast one ND
   
   df.sums <- df %>% select(CLASS,
