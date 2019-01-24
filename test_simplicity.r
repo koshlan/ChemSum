@@ -29,6 +29,7 @@ data %>%
   selectorTCDD() %>% #!# filters to 17 Dioxin Furans
   assignPEFTCCD() %>% #!# assigns PEF/TEF factors
   mutate(CLASS = class_name) %T>%  
+  check_for_all_TCDD() %T>%
   assign(x = "R", value = ., pos = 1) %>% 
   general_analytical_summary(PDI = T) %>%
   output_EDD_from_sums_and_ref(x.sum = ., x.ref = R, my_signif = 2) %>%

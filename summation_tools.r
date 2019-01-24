@@ -476,3 +476,100 @@ assignPEFTCCD <- function(x){
   
   
 }
+
+
+
+check_for_all_txtConstituents<- function(x, txtConstituents){
+
+  check_df <- x %>% group_by(CLASS,txtConstituent) %>% summarise(n=n())
+  if(!identical(sort(check_df$txtConstituent), sort(txtConstituents))){
+    stop("ERROR: Not all analytes are present, summary could be incomplete\n
+         Try using group_by(CLASS,txtConstituent) %>% summarise(n=n()) to diagnose the issue")
+  }
+  check_df <- x %>% group_by(CLASS,txtSampleID) %>% summarise(n=n())
+  if( sum(check_df$n != length(txtConstituents)) > 0) {
+    print(check_df)
+    stop(sprintf("ERROR: Not all sampleIDs have %i analytes, summary could be incomplete\n
+                 Try using group_by(CLASS,txtSampleID) %>% summarise(n=n()) to diagnose the issue", length(txtConstituents)))
+  }
+  return(TRUE)
+}
+
+
+check_for_all_TCDD <- function(x){
+  check <- check_for_all_txtConstituents(x, c("2,3,7,8-TCDD",
+                                     "1,2,3,7,8-PeCDD",
+                                     "2,3,4,7,8-PeCDF",
+                                     "2,3,7,8-TCDF",
+                                     "1,2,3,4,7,8-HxCDD",
+                                     "1,2,3,4,7,8-HxCDF",
+                                     "1,2,3,7,8,9-HxCDF",
+                                     "1,2,3,7,8,9-HxCDD",
+                                     "1,2,3,6,7,8-HxCDD",
+                                     "1,2,3,6,7,8-HxCDF",
+                                     "2,3,4,6,7,8-HxCDF",
+                                     "1,2,3,7,8-PeCDF",
+                                     "1,2,3,4,7,8,9-HpCDF",
+                                     "1,2,3,4,6,7,8-HpCDD",
+                                     "1,2,3,4,6,7,8-HpCDF",
+                                     "OCDF",
+                                     "OCDD"))
+  return(check)
+}
+
+check_for_all_CPAH <- function(x) {
+  check <- check_for_all_txtConstituents(x,  c("Benzo(a)anthracene",
+                                               "Benzo(a)pyrene",
+                                               "Benzo(b)fluoranthene",
+                                               "Benzo(k)fluoranthene",
+                                               "Chrysene",
+                                               "Dibenzo(a,h)anthracene",
+                                               "Indeno(1,2,3-cd)pyrene"))
+  return(check)
+}
+
+check_for_all_LPAH <- function(x) {
+  check <- check_for_all_txtConstituents(x, c("2-Methylnaphthalene", 
+                                              "Acenaphthene", 
+                                              "Acenaphthylene",
+                                              "Anthracene", 
+                                              "Fluorene", 
+                                              "Naphthalene", 
+                                              "Phenanthrene"))
+  return(check)
+}
+
+check_for_all_HPAH <- function(x) {
+  check <- check_for_all_txtConstituents(x, c("Fluoranthene", 
+                                              "Pyrene", 
+                                              "Benzo(a)anthracene", 
+                                              "Chrysene", 
+                                              "Benzofluoranthene", 
+                                              "Benzo(a)pyrene" ,
+                                              "Indeno(1,2,3-cd)pyrene", 
+                                              "Dibenzo(a,h)anthracene", 
+                                              "Benzo(g,h,i)perylene"))
+  return(check)
+}
+
+check_for_all_PAH <- function(x) {
+  check <- check_for_all_txtConstituents(x,c("2-Methylnaphthalene", 
+                                             "Acenaphthene", 
+                                             "Acenaphthylene",
+                                             "Anthracene", 
+                                             "Fluorene", 
+                                             "Naphthalene", 
+                                             "Phenanthrene",
+                                             "Fluoranthene", 
+                                             "Pyrene", 
+                                             "Benzo(a)anthracene", 
+                                             "Chrysene", 
+                                             "Benzofluoranthene", 
+                                             "Benzo(a)pyrene" ,
+                                             "Indeno(1,2,3-cd)pyrene", 
+                                             "Dibenzo(a,h)anthracene", 
+                                             "Benzo(g,h,i)perylene") )
+  return(check)
+}
+
+
