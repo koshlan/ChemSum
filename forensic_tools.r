@@ -94,6 +94,10 @@ matrixify <- function(df){
   return(m)
 }
 
+# see page 227 of Env. Forensics for Miesch calculated CD
+miesch_cd <- function(obs,low_rank_approx){
+  (var(obs) - var(obs-low_rank_approx)) / var(obs)
+}
 
 
 #' remove_zero_variance_cols
@@ -145,6 +149,8 @@ remove_columns <- function(x, remove_ind = c()){
 #'
 #' @return plot command to make PCA biplot
 better_biplot<- function(pca, data.matrix, f = 10, dim1 =1, dim2=2, label_as_number = T){
+  
+  
   var_percent <- round(100*pca$sdev^2/sum(pca$sdev^2),1)
   plot(pca$x[,dim1 ], 
        pca$x[,dim2], 
@@ -193,7 +199,7 @@ better_biplot<- function(pca, data.matrix, f = 10, dim1 =1, dim2=2, label_as_num
 # data <-sqlQuery(con2, query_string)
 # data <- data %>% mutate_if(is.factor, as.character)
 # 
-# testdata <- data %>%  
+# testdata <- data %>%
 #   selectorTCDD() #!# filters to 17 Dioxin Furans
 # 
 # data.matrix <- testdata %>% change_non_detect_to_zero() %>%
@@ -210,31 +216,33 @@ better_biplot<- function(pca, data.matrix, f = 10, dim1 =1, dim2=2, label_as_num
 # dim(remove_columns(data.matrix, c(1,2,3)))
 # # variable-by-variable goodness
 # 
-# # recomose the matrix  
+# # recomose the matrix
 # M = (t(pca$x[] %*% t(pca$rotation[])) * pca$scale  + pca$center)
 # # recompose matrix using only < n > compoents
-# n = 3 
+# n = 3
 # M_approx = (t(pca$x[,1:n] %*% t(pca$rotation[,1:n])) * pca$scale  + pca$center)
-#  
+# 
 # par(mfrow = c(4,4), mar = c(2,2,2,2))
 # for(i in 2:nrow(M)) {
-#   plot(M[i,], 
+#   cd = round(miesch_cd(M[i,], M_approx[i,]),2)
+#   plot(M[i,],
 #        M_approx[i,],
 #        pch = 20,
 #        cex = .5,
 #        col = "#00000050",
-#        main = paste(rownames(M)[i], "(rank:" ,n ,")") , 
+#        main = paste(rownames(M)[i], "(rank:" ,n ,")") ,
 #        ylab = "low-rank prediction",
 #        xlab = "measured-value",
 #        ylim = c(0,max(c( M[i,],
 #                        M_approx[i,]) ) ),
 #        xlim = c(0,max(c( M[i,],
-#                          M_approx[i,]) ) ) )  
+#                          M_approx[i,]) ) ) )
 #   abline(0,1, col = "gray")
-#   text(M[i,], 
-#        M_approx[i,], 
-#        labels= 1:ncol(M), 
-#        cex = .75, 
+#   text(M[i,],
+#        M_approx[i,],
+#        labels= 1:ncol(M),
+#        cex = .75,
 #        pos = 2,
 #        col = "#00000050")
+#   text(0,0.95*max(M_approx[i,], M[i,]), label = paste("CD =", cd), pos =4, cex = 1 )
 # }
